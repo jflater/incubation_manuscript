@@ -16,23 +16,21 @@ output:
 
 # Questions:
 
-### Are there differences in treatments? Similarities?
+### HOW DO AMENDMENTS COMPARE?Are there differences in treatments? Similarities?
 * Differences in community structure as measured by:
-    1) Diversity
-    2) Richness
-    3) Dissimilarity measures (uni-frac + NMDS)
-    4) Most abundant species
-    5) Differences in replications within a treatment and day...how well does a soil sample of 0.25 get replicated across 12 microcosms?
-    6) Soil characteristics? Not sure if focus of this paper should be strongly tied to the chemical measures or not.
-    7) Who are the shared OTUs between treatments? Days? Any shared across all?  
+    1) Microbial soil health measurements:  Diversity, Richness
+            a) Dissimilarity measures (uni-frac + NMDS)
+            b) Most abundant species
+    2) Nutrient soil health measurements
+    3) When and how are these differences most pronounced?
+            a) early and late time points
+            b) who is always there - core analysis
+            c) early and late responders
+                  i) do these correlate to chemical data?  are there env conditions that describe the response?
+                          a) constrained CCA
+                  ii) Where do these responders originate?  Do they persist?
 
-### When do we see these differences?
-* When we see the changes in abundance of a specific OTU for example, can we correlate that with changes in chemical data?
-* Or with a specific day in time? 
 
-### Who is involed in theses differences?
-* Where do they come from?
-* Do they stick around? 
 
 ##Jared's thoughts:
 
