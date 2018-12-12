@@ -1,0 +1,77 @@
+---
+title: "Incubation"
+author: Jared Flater
+output:
+  html_document: default
+  md_document: default
+---
+****
+>#A thing is right when it tends to preserve the integrity, stability and beauty of the biotic community. It is wrong when it tends otherwise.
+
+![](./images/giphy.gif)
+
+#$\color{green}{\text{Longitudinal study of soils amended with }}$ 
+#$\color{green}{\text{ four treatments of varying nutrient availability}}$ 
+****
+# Questions:
+
+### Are there differences in treatments? Similarities?
+* Differences in community structure as measured by:
+    1) Diversity
+    2) Richness
+    3) Dissimilarity measures (uni-frac + NMDS)
+    4) Most abundant species
+    5) Differences in replications within a treatment and day...how well does a soil sample of 0.25 get replicated across 12 microcosms?
+    6) Soil characteristics? Not sure if focus of this paper should be strongly tied to the chemical measures or not.
+    7) Who are the shared OTUs between treatments? Days? Any shared across all?  
+
+### When do we see these differences?
+* When we see the changes in abundance of a specific OTU for example, can we correlate that with changes in chemical data?
+* Or with a specific day in time? 
+
+### Who is involed in theses differences?
+* Where do they come from?
+* Do they stick around? 
+
+##$\color{blue}{\text{Jared's thoughts:}}$ 
+
+* What is the best way to leverage this data for future work not only on incubation, the STRIPs project for example? 
+    + Take advantage of longitudinal aspect
+    + Representative sequences and FAPROTAX
+    + K and N strategists and how are they distributed across treatments and time? 
+    + Nitrogen cycling bacteria distribution 
+    
+
+#$\color{red}{\text{Objectives for short term:}}$ 
+1) Use Jin's rep OTUs to construct a tree
+2) Use uni-frac for ordinations for the paper
+3) Cluster with uni-frac vs. bray-curtis, will capture more information regarding how the OTUs are related. 
+4) Include networks in this paper? We could use FAPROTAX to add attributes to the network showing functional information?
+
+###### From thesis:
+>In this study, we study the impacts of amendments of both alfalfa and compost, provided at
+equal rates of total nitrogen, to a soil but with differing C: N ratios chosen to result in
+immobilization (compost) or mineralization (alfalfa). We characterize both the chemical and
+microbial response to these amendments and hypothesize that specific microbial
+communities will respond to initial nitrogen and carbon availability and that this membership
+will be specific to varying amendments. We expect that these distinct early microbial
+responders will dominate soil microbial communities in response to organic amendments and
+will decrease in abundance through time. Our objective was to characterize these early
+responding microbial communities for various organic amendments and to identify potential
+microbial membership within organic amendments that may be involved in plant nutrient
+availability.
+
+ 
+##$\color{green}{\text{Manuscript outline:}}$ 
+* Introduction
+* Materials and methods
+* Results
+* Discussion/Conclusion
+
+****
+# Visualization of results:
+Generate list of OTUs from compost and alfalfa amendment:
+```{r}
+#p <- readRDS(file = "")
+```
+
