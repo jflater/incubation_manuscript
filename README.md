@@ -22,13 +22,12 @@ Questions:
     2.  Nutrient soil health measurements  
         A. When and how are these differences most pronounced?  
         B. early and late time points  
-        C. who is always there - core analysis  
-
-    -   early and late responders  
-        do these correlate to chemical data? are there env conditions
-        that describe the response?  
-        constrained CCA  
-        Where do these responders originate? Do they persist?
+    3.  who is always there - core analysis  
+    4.  early and late responders  
+        A. do these correlate to chemical data?  
+        B. are there env conditions that describe the response?  
+        - constrained CCA  
+        C. Where do these responders originate? Do they persist?
 
 Jared's thoughts:
 -----------------
