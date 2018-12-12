@@ -2,16 +2,16 @@
 title: "Incubation"
 author: Jared Flater
 output:
-  md_document: default
   html_document: default
+  md_document: default
 ---
 ****
 >#A thing is right when it tends to preserve the integrity, stability and beauty of the biotic community. It is wrong when it tends otherwise.
 
 ![](./images/giphy.gif)
 
-Longitudinal study of soils amended with
-four treatments of varying nutrient availability
+#Longitudinal study of soils amended with four treatments of varying nutrient availability
+
 ****
 
 # Questions:
