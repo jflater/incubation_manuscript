@@ -49,6 +49,8 @@ Jared's thoughts:
     -   K and N strategists and how are they distributed across
         treatments and time?
     -   Nitrogen cycling bacteria distribution
+    -   What functional catagories can we get from FAPROTAX? EPS,
+        N-Cycling, filament growth?
 
 Objectives for short term:
 ==========================
