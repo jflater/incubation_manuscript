@@ -5,16 +5,8 @@
 
 ![](./images/giphy.gif)
 
-$\\color{green}{\\text{Longitudinal study of soils amended with }}$
-===================================================================
-
-$\\color{green}{\\text{ four treatments of varying nutrient availability}}$
-===========================================================================
-
-------------------------------------------------------------------------
-
-Questions:
-==========
+Longitudinal study of soils amended with four treatments of varying
+nutrient availability \*\*\*\* \# Questions:
 
 ### Are there differences in treatments? Similarities?
 
@@ -42,8 +34,8 @@ Questions:
 -   Where do they come from?
 -   Do they stick around?
 
-$\\color{blue}{\\text{Jared's thoughts:}}$
-------------------------------------------
+Jared's thoughts:
+-----------------
 
 -   What is the best way to leverage this data for future work not only
     on incubation, the STRIPs project for example?
@@ -53,8 +45,8 @@ $\\color{blue}{\\text{Jared's thoughts:}}$
         treatments and time?
     -   Nitrogen cycling bacteria distribution
 
-$\\color{red}{\\text{Objectives for short term:}}$
-==================================================
+Objectives for short term:
+==========================
 
 1.  Use Jin's rep OTUs to construct a tree
 2.  Use uni-frac for ordinations for the paper
@@ -80,8 +72,8 @@ $\\color{red}{\\text{Objectives for short term:}}$
 > membership within organic amendments that may be involved in plant
 > nutrient availability.
 
-$\\color{green}{\\text{Manuscript outline:}}$
----------------------------------------------
+Manuscript outline:
+-------------------
 
 -   Introduction
 -   Materials and methods
