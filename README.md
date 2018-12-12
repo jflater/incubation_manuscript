@@ -26,7 +26,7 @@ Questions:
     4.  early and late responders  
         A. do these correlate to chemical data?  
         B. are there env conditions that describe the response?  
-        - constrained CCA  
+        + constrained CCA  
         C. Where do these responders originate? Do they persist?
 
 Jared's thoughts:
