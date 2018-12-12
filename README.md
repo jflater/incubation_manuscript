@@ -13,7 +13,7 @@ Longitudinal study of soils amended with four treatments of varying nutrient ava
 Questions:
 ==========
 
-### HOW DO AMENDMENTS COMPARE?Are there differences in treatments? Similarities?
+### HOW DO AMENDMENTS COMPARE? Are there differences in treatments? Similarities?
 
 1.  Differences in community structure as measured by:
     1.  Microbial soil health measurements: Diversity, Richness  
@@ -26,7 +26,8 @@ Questions:
     4.  early and late responders  
         A. do these correlate to chemical data?  
         B. are there env conditions that describe the response?  
-        + constrained CCA  
+        + constrained CCA
+
         C. Where do these responders originate? Do they persist?
 
 Jared's thoughts:
