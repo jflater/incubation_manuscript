@@ -6,7 +6,10 @@
 ![](./images/giphy.gif)
 
 Longitudinal study of soils amended with four treatments of varying
-nutrient availability \*\*\*\* \# Questions:
+nutrient availability \*\*\*\*
+
+Questions:
+==========
 
 ### Are there differences in treatments? Similarities?
 
