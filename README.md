@@ -19,13 +19,16 @@ Questions:
     1.  Microbial soil health measurements: Diversity, Richness  
         A. Dissimilarity measures (uni-frac + NMDS)  
         B. Most abundant species  
-    2.  Nutrient soil health measurements A. When and how are these
-        differences most pronounced? B. early and late time points C.
-        who is always there - core analysis
+    2.  Nutrient soil health measurements  
+        A. When and how are these differences most pronounced?  
+        B. early and late time points  
+        C. who is always there - core analysis  
 
-    -   early and late responders do these correlate to chemical data?
-        are there env conditions that describe the response? constrained
-        CCA Where do these responders originate? Do they persist?
+    -   early and late responders  
+        do these correlate to chemical data? are there env conditions
+        that describe the response?  
+        constrained CCA  
+        Where do these responders originate? Do they persist?
 
 Jared's thoughts:
 -----------------
