@@ -5,8 +5,8 @@
 
 ![](./images/giphy.gif)
 
-Longitudinal study of soils amended with four treatments of varying
-nutrient availability
+Longitudinal study of soils amended with four treatments of varying nutrient availability
+=========================================================================================
 
 ------------------------------------------------------------------------
 
