@@ -25,7 +25,8 @@ Questions:
     3.  who is always there - core analysis  
     4.  early and late responders  
         A. do these correlate to chemical data?  
-        B. are there env conditions that describe the response?  
+        B. are there environmental conditions that describe the
+        response?  
         + constrained CCA
 
         C. Where do these responders originate? Do they persist?
@@ -40,7 +41,7 @@ Jared's thoughts:
     -   K and N strategists and how are they distributed across
         treatments and time?
     -   Nitrogen cycling bacteria distribution
-    -   What functional catagories can we get from FAPROTAX? EPS,
+    -   What functional categories can we get from FAPROTAX? EPS,
         N-Cycling, filament growth?
 
 Objectives for short term:
@@ -69,6 +70,15 @@ Objectives for short term:
 > various organic amendments and to identify potential microbial
 > membership within organic amendments that may be involved in plant
 > nutrient availability.
+
+Lit Review and desired figures
+------------------------------
+
+<https://www.nature.com/articles/nrmicro2367#f1>  
+![](./images/nrmicro2367-f1.jpg)  
+This figure could be of a response group, the habitat info replaced with
+treatment, the GC content with ??? and the genome size with relative
+abundance
 
 Manuscript outline:
 -------------------
