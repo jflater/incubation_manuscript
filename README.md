@@ -15,9 +15,10 @@ Questions:
 
 ### HOW DO AMENDMENTS COMPARE?Are there differences in treatments? Similarities?
 
--   Differences in community structure as measured by:
+1.  Differences in community structure as measured by:
     -   Microbial soil health measurements: Diversity, Richness
-    -   Dissimilarity measures (uni-frac + NMDS) Most abundant species
+    -   Dissimilarity measures (uni-frac + NMDS)
+    -   Most abundant species
 
     -   Nutrient soil health measurements
     -   When and how are these differences most pronounced?
