@@ -15,26 +15,17 @@ Questions:
 
 ### HOW DO AMENDMENTS COMPARE?Are there differences in treatments? Similarities?
 
--   Differences in community structure as measured by: +Microbial soil
-    health measurements: Diversity, Richness -Dissimilarity measures
-    (uni-frac + NMDS)
+-   Differences in community structure as measured by:
+    -   Microbial soil health measurements: Diversity, Richness
+    -   Dissimilarity measures (uni-frac + NMDS) Most abundant species
 
-        Most abundant species
-
-    +Nutrient soil health measurements +When and how are these
-    differences most pronounced?
-
-        early and late time points
-
-        who is always there - core analysis
-
-        early and late responders
-
-            do these correlate to chemical data?  are there env conditions that describe the response?
-
-                constrained CCA
-
-                    Where do these responders originate?  Do they persist?
+    -   Nutrient soil health measurements
+    -   When and how are these differences most pronounced?
+    -   early and late time points
+    -   who is always there - core analysis
+    -   early and late responders do these correlate to chemical data?
+        are there env conditions that describe the response? constrained
+        CCA Where do these responders originate? Do they persist?
 
 Jared's thoughts:
 -----------------
