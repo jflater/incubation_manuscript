@@ -79,20 +79,3 @@ Lit Review and desired figures
 This figure could be of a response group, the habitat info replaced with
 treatment, the GC content with ??? and the genome size with relative
 abundance
-
-Manuscript outline:
--------------------
-
--   Introduction
--   Materials and methods
--   Results
--   Discussion/Conclusion
-
-------------------------------------------------------------------------
-
-Visualization of results:
-=========================
-
-Generate list of OTUs from compost and alfalfa amendment:
-
-    #p <- readRDS(file = "")
