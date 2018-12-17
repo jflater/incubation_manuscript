@@ -1,0 +1,24 @@
+---
+title: "Incubation Phylogenetic Tree Notebook"
+output: html_notebook
+---
+We used Jin's python script to generate an aligned fasta file with the representative sequences for each OTU from the incubated microcosm soils and amendments. A phylogenetic tree was constructed using this aligned file using FastTree.       
+
+Download from HPCC using SCP
+```{bash}
+scp flaterj1@rsync.hpcc.msu.edu:/mnt/research/germs/jared/Incubation/raw/tree.nwk ./tree.nwk
+```
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ggtree", version = "3.8")
+```
+
+```{r}
+library(tidyverse)
+library(ggtree)
+
+tree <- read.tree("data/tree.nwk")
+tree
+```
+
