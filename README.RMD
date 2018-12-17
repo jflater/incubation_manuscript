@@ -2,8 +2,8 @@
 title: "Incubation"
 author: Jared Flater
 output:
-  md_document: default
   html_document: default
+  md_document: default
 ---
 ****
 >#A thing is right when it tends to preserve the integrity, stability and beauty of the biotic community. It is wrong when it tends otherwise.
@@ -67,3 +67,18 @@ https://www.nature.com/articles/nrmicro2367#f1
 ![](./images/nrmicro2367-f1.jpg)   
 This figure could be of a response group, the habitat info replaced with treatment, the GC content with ??? and the genome size with relative abundance
 
+https://academic.oup.com/femsec/article/94/4/fiy027/4867966#116819013  
+>Bulk soil and maize rhizosphere resistance genes, mobile genetic elements and microbial communities are differently impacted by organic and inorganic fertilization      
+
+Identified responding OTUS, used edgeR
+
+>Major phylogenetic changes detected at phylum/class levels and responding gen-
+era/OTUs were extracted by the likelihood ratio test after neg-
+ative binomial generalized linear modeling (nbGLM) of the raw
+counts with the false discovery rate (FDR) adjusted
+p-values (p-value < 0.05, R package edgeR, Robinson, McCarthy and Smyth 2010)                  
+
+![](./images/fiy027fig4.jpeg)   
+
+What is the `likelihood ratio test`?   
+https://hbctraining.github.io/DGE_workshop/lessons/08_DGE_LRT.html
