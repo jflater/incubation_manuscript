@@ -79,3 +79,25 @@ Lit Review and desired figures
 This figure could be of a response group, the habitat info replaced with
 treatment, the GC content with ??? and the genome size with relative
 abundance
+
+------------------------------------------------------------------------
+
+<https://academic.oup.com/femsec/article/94/4/fiy027/4867966#116819013>
+
+> Bulk soil and maize rhizosphere resistance genes, mobile genetic
+> elements and microbial communities are differently impacted by organic
+> and inorganic fertilization
+
+Identified responding OTUS, used edgeR
+
+> Major phylogenetic changes detected at phylum/class levels and
+> responding gen- era/OTUs were extracted by the likelihood ratio test
+> after neg- ative binomial generalized linear modeling (nbGLM) of the
+> raw counts with the false discovery rate (FDR) adjusted p-values
+> (p-value &lt; 0.05, R package edgeR, Robinson, McCarthy and Smyth
+> 2010)
+
+![](./images/fiy027fig4.jpeg)
+
+What is the `likelihood ratio test`?  
+<https://hbctraining.github.io/DGE_workshop/lessons/08_DGE_LRT.html>
