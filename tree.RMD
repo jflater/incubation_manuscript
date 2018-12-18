@@ -21,4 +21,3 @@ library(ggtree)
 tree <- read.tree("data/tree.nwk")
 tree
 ```
-
