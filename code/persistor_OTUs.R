@@ -1,29 +1,44 @@
-incubation.physeq <- readRDS("data/incubation_physeq_Aug18.RDS")
+library(tidyverse)
+library(gplots)
+# Read in whole phyloseq object
+incubation.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
+GetOTUs <- function(physeq, samplestogetotusfrom) {
+  subset_samples(physeq, treatment == "samplestogetotusfrom") %>%
+    filter_taxa(function(x) sum(x) > 0, T) %>%
+    tax_table() %>%
+    row.names()
+}
+
+alfalfa.amendment.otus <- GetOTUs(incubation.physeq, "Alfalfa")
+
+# Make new object with only samples from the inputs
 inputs <- subset_samples(incubation.physeq, treatment %in% c("AlfalfaAmend", "AlfalfaSoil", "CompostAmend"))
 
+# Get incubated alfalfa samples
 alfala.physeq <- subset_samples(incubation.physeq, treatment == c("Alfalfa")) %>%
   filter_taxa(function(x) sum(x) > 0, T) 
 
-alfala.physeq.input <- alfala.physeq %>% tax_table() %>%
+# get OTUs from alfalfa samples
+alfala.incubated.otus <- alfala.physeq %>% tax_table() %>%
   row.names()
 
-alfalfa.input <- subset_samples(inputs, treatment == "AlfalfaAmend") %>%
+alfalfa.amendment.otus <- subset_samples(inputs, treatment == "AlfalfaAmend") %>%
   filter_taxa(function(x) sum(x) > 0, T) %>%
   tax_table() %>%
   row.names()
 
-compost.input <- subset_samples(inputs, treatment == "CompostAmend") %>%
+compost.amendment.otus <- subset_samples(inputs, treatment == "CompostAmend") %>%
   filter_taxa(function(x) sum(x) > 0, T) %>%
   tax_table() %>%
   row.names()
 
-soil <- subset_samples(inputs, treatment == "AlfalfaSoil") %>%
+soil.amendment.otus <- subset_samples(inputs, treatment == "AlfalfaSoil") %>%
   filter_taxa(function(x) sum(x) > 0, T) %>%
   tax_table() %>%
   row.names()
 
-otus <- list(alfalfa.input, compost.input, soil)
+otus <- list(alfalfa.amendment.otus, compost.amendment.otus, soil.amendment.otus)
 venn <- venn(otus)
 
 common.otus <- attr(venn,"intersections")$`A:B:C`
