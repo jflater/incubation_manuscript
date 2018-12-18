@@ -2,8 +2,8 @@
 title: "Incubation"
 author: Jared Flater
 output:
-  html_document: default
   md_document: default
+  html_document: default
 ---
 ****
 >#A thing is right when it tends to preserve the integrity, stability and beauty of the biotic community. It is wrong when it tends otherwise.
