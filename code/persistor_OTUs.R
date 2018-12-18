@@ -1,4 +1,4 @@
-incubation.physeq <- readRDS("Data/incubation_physeq_Aug18.RDS")
+incubation.physeq <- readRDS("data/incubation_physeq_Aug18.RDS")
 
 inputs <- subset_samples(incubation.physeq, treatment %in% c("AlfalfaAmend", "AlfalfaSoil", "CompostAmend"))
 
@@ -39,6 +39,5 @@ alf.venn <- venn(alfa.otus)
 ex2 = prune_taxa(attr(alf.venn, "intersections")$`A`, alfala.physeq) %>%
   filter_taxa(function(x) sum(x) > 0, T)
 
-%>%
-  plot_heatmap()
+
   
