@@ -80,9 +80,9 @@ This figure could be of a response group, the habitat info replaced with
 treatment, the GC content with ??? and the genome size with relative
 abundance
 
-<https://academic.oup.com/femsec/article/94/4/fiy027/4867966#116819013>
-
 ------------------------------------------------------------------------
+
+<https://academic.oup.com/femsec/article/94/4/fiy027/4867966#116819013>
 
 > Bulk soil and maize rhizosphere resistance genes, mobile genetic
 > elements and microbial communities are differently impacted by organic
