@@ -65,7 +65,11 @@ availability.
 ## Lit Review and desired figures   
 https://www.nature.com/articles/nrmicro2367#f1    
 ![](./images/nrmicro2367-f1.jpg)   
+
+ 
 This figure could be of a response group, the habitat info replaced with treatment, the GC content with ??? and the genome size with relative abundance
+
+![](./images/nrmicro2367-f4.jpg)  
 
 ****    
 
