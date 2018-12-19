@@ -7,18 +7,28 @@ incubation.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 ######
 # Working on function to get a list of OTUs from a sample type
 GetOTUs <- function(z, y) {
-    subset_samples(z, treatment == as.character(y)) %>%
+    prune_samples(sample_data(z)$treatment %in% c(y), z) %>%
     filter_taxa(function(x) sum(x) > 0, T) %>%
     tax_table() %>%
     row.names()
 }
 
+test <- GetOTUs(incubation.physeq, "Alfalfa")
+
 # Testing the function
 alfalfa.amendment.otus <- GetOTUs(incubation.physeq, "Alfalfa")
+z = incubation.physeq
+y = "Alfalfa"
+subset_samples(z, treatment == y) %>%
+  filter_taxa(function(x) sum(x) > 0, T) %>%
+  tax_table() %>%
+  row.names()
+
+
 #####
 
 # Make new object with only samples from the inputs
-inputs <- subset_samples(incubation.physeq, treatment %in% c("AlfalfaAmend", "AlfalfaSoil", "CompostAmend"))
+inputs <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("AlfalfaAmend", "AlfalfaSoil", "CompostAmend"), incubation.physeq)
 
 # Get incubated alfalfa samples
 alfala.incubated.otus <- subset_samples(incubation.physeq, treatment == "Alfalfa") %>%
