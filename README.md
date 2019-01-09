@@ -8,6 +8,29 @@
 Longitudinal study of soils amended with four treatments of varying nutrient availability
 =========================================================================================
 
+Outline of manuscript:
+======================
+
+Main goal: characterize community structure in soils undergoing
+mineralization and immobilization  
+Secondary goals: transfer and persistors
+
+> In general, copiotrophic bacteria should have higher growth rates, a
+> greater degree of variability in popula- tion size, and lower
+> substrate affinities than oligotrophic bacteria (Table 2). In
+> environments where microorgan- isms are exposed to sustained
+> environmental stress, particularly where the stress stems from low
+> resource concentrations, oligotrophs are likely to outcompete
+> copiotrophs. We would also expect that microbial succession on
+> substrates rich in organic matter, such as leaf litter or other types
+> of fresh organic detritus, should be dominated by copiotrophs in the
+> earlier stages, with oligotrophs increasing in relative abundance as
+> substrate quality and/or quantity declines over time (Jackson 2003).
+> In contrast, we would expect oligotrophs to be the first to colonize
+> nutrient- poor substrates, such as mineral surfaces, with copiotrophs
+> increasing in abun- dance as communities mature and develop in
+> size.(Fierer, 2007)
+
 ------------------------------------------------------------------------
 
 Questions:
