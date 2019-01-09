@@ -12,6 +12,10 @@ output:
 
 #Longitudinal study of soils amended with four treatments of varying nutrient availability
 
+# Outline of manuscript:  
+Main goal: characterize community structure in soils undergoing mineralization and immobilization    
+Secondary goals: transfer and persistors
+
 ****
 
 # Questions:
