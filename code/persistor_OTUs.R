@@ -44,5 +44,9 @@ aliens.venn <- venn(aliens)
 # aliens detected!
 alf.aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
 
+# subset incubated alfalfa microcosms to alien otus and plot heatmap
+alfalfa <- prune_samples(sample_data(physeq)$treatment %in% c("Alfalfa"), incubation.physeq) %>%
+  filter_taxa(function(x) sum(x) > 1, T) 
 
+alf.incubated.aliens <- prune_taxa(aliens.detected, alfalfa)
   

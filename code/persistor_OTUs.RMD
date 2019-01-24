@@ -1,0 +1,91 @@
+ Libraries needed
+```{r, message=F}
+library(phyloseq)
+library(tidyverse)
+library(gplots)
+```
+
+ Read in whole phyloseq object
+```{r}
+incubation.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
+```
+
+ See what categories describe our treatments:
+```{r}
+levels(sample_data(incubation.physeq)$treatment)
+```
+
+ Function to get a list of OTUs from a sample type
+```{r}
+GetOTUs <- function(physeq, samples) {
+    prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
+    filter_taxa(function(x) sum(x) > 1, T) %>%
+    tax_table() %>%
+    row.names()
+}
+```
+
+ Using function to generate list of OTUs from all starting soil, incubated soils and amendments
+```{r}
+# Incubated samples:
+Alfalfa.otus <- GetOTUs(incubation.physeq, c("Alfalfa"))
+Compost.otus <- GetOTUs(incubation.physeq, c("Compost"))
+CompAlfa.otus <- GetOTUs(incubation.physeq, c("CompAlfa"))
+Control.otus <- GetOTUs(incubation.physeq, c("Control"))
+# Amendment samples:
+AlfalfaAmend.otus <- GetOTUs(incubation.physeq, c("AlfalfaAmend"))
+CompostAmend.otus <- GetOTUs(incubation.physeq, c("CompostAmend"))
+# Soil sample:
+AlfalfaSoil.otus <- GetOTUs(incubation.physeq, c("AlfalfaSoil"))
+```
+
+ Venn diagram for identifying OTUs unique to alfalfa amendment that were not detected in the incubated control soils
+```{r}
+otus <- list(AlfalfaAmend.otus, Control.otus)
+venn <- venn(otus)
+```
+
+ OTUs in alfalfa amendment but not detected in incubated control samples are candidates for "Alien" status, or those otus
+that transfer from the amendment to the soil and were not present prior to amendment of soil
+```{r}
+alf.aliens <- attr(venn, "intersections")$A
+```
+
+ Compare aliens to incubated alfalfa samples
+```{r}
+aliens <- list(alf.aliens, Alfalfa.otus)
+aliens.venn <- venn(aliens)
+```
+
+ Aliens detected! 67 OTUs from alfalfa amendment only detected in incubated alfalfa samples
+```{r}
+alf.aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+```
+
+ Subset incubated alfalfa microcosms to alien otus and plot heatmap, also converting to relative abundance after removing singletons
+```{r}
+alfalfa <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Alfalfa"), incubation.physeq) %>%
+  filter_taxa(function(x) sum(x) > 1, T) 
+```
+
+ Prune taxa in incubated alfalfa phyloseq object to just the 67 aliens  
+```{r}
+alf.incubated.aliens <- prune_taxa(alf.aliens.detected, alfalfa) 
+```
+
+ Sample order for plotting heatmap (days will be on x axis, this ensures that they are in chronological order)
+```{r, warning=F}
+alf.sample.order <- as.data.frame(sample_data(alf.incubated.aliens)) %>%
+  arrange(day, replication) %>%
+  select(i_id) %>%
+  remove_rownames() 
+```
+
+```{r, warning=F}
+alf.alien.heatmap <- plot_heatmap(alf.incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  sample.order = as.character(alf.sample.order$i_id), 
+                                  low = "#66CCFF", high = "#000033", na.value = "white", 
+                                  title = "Aliens in alfalfa amended microcosms") 
+alf.alien.heatmap
+```
+
