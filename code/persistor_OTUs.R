@@ -29,24 +29,61 @@ CompostAmend.otus <- GetOTUs(incubation.physeq, c("CompostAmend"))
 AlfalfaSoil.otus <- GetOTUs(incubation.physeq, c("AlfalfaSoil"))
 
 
-# Venn diagram for identifying OTUs unique to alfalfa amendment that were not detected in the incubated control soils
+GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus,samples){
+  otus <- list(alien_otus, control_otus)
+  venn <- venn(otus)
+  alf.aliens <- attr(venn, "intersections")$A
+  aliens <- list(alf.aliens, recieving_otus)
+  aliens.venn <- venn(aliens)
+  aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+  alfalfa <- prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
+    filter_taxa(function(x) sum(x) > 1, T) 
+  alf.incubated.aliens <- prune_taxa(aliens.detected, alfalfa)
+  alf.sample.order <- as.data.frame(sample_data(alf.incubated.aliens)) %>%
+    arrange(day, replication) %>%
+    select(i_id) %>%
+    remove_rownames()   
+  alf.alien.heatmap <- plot_heatmap(alf.incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  sample.order = as.character(alf.sample.order$i_id), 
+                                  low = "#66CCFF", high = "#000033", na.value = "white")
+  alf.alien.heatmap
+}
+#GetAlienHeatMap(incubation.physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c("Alfalfa"))
+#GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
+
+otus <- list(CompostAmend.otus, Control.otus)
+venn <- venn(otus)
+aliens <- attr(venn, "intersections")$A
+alien.list <- list(aliens, Compost.otus)
+aliens.venn <- venn(alien.list)
+aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+incubated <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Compost"), incubation.physeq) %>%
+  filter_taxa(function(x) sum(x) > 1, T) 
+incubated.aliens <- prune_taxa(aliens.detected, incubated) 
+sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
+  arrange(day, replication) %>%
+  select(i_id) %>%
+  remove_rownames() 
+alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  sample.order = as.character(alf.sample.order$i_id), 
+                                  low = "#66CCFF", high = "#000033", na.value = "white")
+alien.heatmap
+
 otus <- list(AlfalfaAmend.otus, Control.otus)
 venn <- venn(otus)
-
-# OTUs in alfalfa amendment but not detected in incubated control samples are candidates for "Alien" status, or thos otus
-# that transfer from the amendment to the soil and were not present prior amendment of soil
-alf.aliens <- attr(venn, "intersections")$A
-
-# compare aliens to incubated alfalfa samples
-aliens <- list(alf.aliens, Alfalfa.otus)
-aliens.venn <- venn(aliens)
-
-# aliens detected!
-alf.aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
-
-# subset incubated alfalfa microcosms to alien otus and plot heatmap
-alfalfa <- prune_samples(sample_data(physeq)$treatment %in% c("Alfalfa"), incubation.physeq) %>%
+aliens <- attr(venn, "intersections")$A
+alien.list <- list(aliens, Alfalfa.otus)
+aliens.venn <- venn(alien.list)
+aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+incubated <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Alfalfa"), incubation.physeq) %>%
   filter_taxa(function(x) sum(x) > 1, T) 
+incubated.aliens <- prune_taxa(aliens.detected, incubated) 
+sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
+  arrange(day, replication) %>%
+  select(i_id) %>%
+  remove_rownames() 
+alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                              sample.order = as.character(alf.sample.order$i_id), 
+                              low = "#66CCFF", high = "#000033", na.value = "white")
+alien.heatmap
 
-alf.incubated.aliens <- prune_taxa(aliens.detected, alfalfa)
-  
