@@ -52,20 +52,29 @@ GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus,sam
 #GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
 
 otus <- list(CompostAmend.otus, Control.otus)
+otus
 venn <- venn(otus)
+venn
 aliens <- attr(venn, "intersections")$A
+aliens
 alien.list <- list(aliens, Compost.otus)
+alien.list
 aliens.venn <- venn(alien.list)
+aliens.venn
 aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+aliens.detected
 incubated <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Compost"), incubation.physeq) %>%
   filter_taxa(function(x) sum(x) > 1, T) 
+incubated
 incubated.aliens <- prune_taxa(aliens.detected, incubated) 
+incubated.aliens
 sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
   arrange(day, replication) %>%
   select(i_id) %>%
   remove_rownames() 
+sample.order
 alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
-                                  sample.order = as.character(alf.sample.order$i_id), 
+                                  sample.order = as.character(sample.order$i_id), 
                                   low = "#66CCFF", high = "#000033", na.value = "white")
 alien.heatmap
 
@@ -83,7 +92,7 @@ sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
   select(i_id) %>%
   remove_rownames() 
 alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
-                              sample.order = as.character(alf.sample.order$i_id), 
+                              sample.order = as.character(sample.order$i_id), 
                               low = "#66CCFF", high = "#000033", na.value = "white")
 alien.heatmap
 
