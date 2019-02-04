@@ -39,53 +39,44 @@ CompostAmend.otus <- GetOTUs(incubation.physeq, c("CompostAmend"))
 AlfalfaSoil.otus <- GetOTUs(incubation.physeq, c("AlfalfaSoil"))
 ```
 
- Venn diagram for identifying OTUs unique to alfalfa amendment that were not detected in the incubated control soils
 ```{r}
-otus <- list(AlfalfaAmend.otus, Control.otus)
-venn <- venn(otus)
+GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus,samples){
+  otus <- list(alien_otus, control_otus)
+  venn <- venn(otus)
+  alf.aliens <- attr(venn, "intersections")$A
+  aliens <- list(alf.aliens, recieving_otus)
+  aliens.venn <- venn(aliens)
+  aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+  incubated <- prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
+    filter_taxa(function(x) sum(x) > 5, T) %>%
+    transform_sample_counts(function(x) x / sum(x)) 
+  incubated.aliens <- prune_taxa(aliens.detected, incubated)
+  sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
+    arrange(day, replication) %>%
+    select(i_id) %>%
+    remove_rownames()   
+  alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  sample.order = as.character(sample.order$i_id), 
+                                  low = "#66CCFF", high = "#000033", na.value = "white")
+  alien.heatmap
+}
 ```
 
- OTUs in alfalfa amendment but not detected in incubated control samples are candidates for "Alien" status, or those otus
-that transfer from the amendment to the soil and were not present prior to amendment of soil
 ```{r}
-alf.aliens <- attr(venn, "intersections")$A
+alf.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c("Alfalfa"))
+comp.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
 ```
-
- Compare aliens to incubated alfalfa samples
 ```{r}
-aliens <- list(alf.aliens, Alfalfa.otus)
-aliens.venn <- venn(aliens)
+alf.heatmap
 ```
-
- Aliens detected! 67 OTUs from alfalfa amendment only detected in incubated alfalfa samples
 ```{r}
-alf.aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+comp.heatmap
 ```
 
- Subset incubated alfalfa microcosms to alien otus and plot heatmap, also converting to relative abundance after removing singletons
+I didn't extract DNA from a mixed sample of compost and alfalfa, to get the list of potential aliens, we will combine the two lists from alfalfa and compost.
 ```{r}
-alfalfa <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Alfalfa"), incubation.physeq) %>%
-  filter_taxa(function(x) sum(x) > 1, T) 
-```
-
- Prune taxa in incubated alfalfa phyloseq object to just the 67 aliens  
-```{r}
-alf.incubated.aliens <- prune_taxa(alf.aliens.detected, alfalfa) 
-```
-
- Sample order for plotting heatmap (days will be on x axis, this ensures that they are in chronological order)
-```{r, warning=F}
-alf.sample.order <- as.data.frame(sample_data(alf.incubated.aliens)) %>%
-  arrange(day, replication) %>%
-  select(i_id) %>%
-  remove_rownames() 
-```
-
-```{r, warning=F}
-alf.alien.heatmap <- plot_heatmap(alf.incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
-                                  sample.order = as.character(alf.sample.order$i_id), 
-                                  low = "#66CCFF", high = "#000033", na.value = "white", 
-                                  title = "Aliens in alfalfa amended microcosms") 
-alf.alien.heatmap
+mix <- c(AlfalfaAmend.otus, CompostAmend.otus)
+mix.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, mix, CompAlfa.otus, c("CompAlfa"))
+mix.heatmap
 ```
 

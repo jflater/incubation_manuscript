@@ -48,8 +48,8 @@ GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus,sam
                                   low = "#66CCFF", high = "#000033", na.value = "white")
   alf.alien.heatmap
 }
-#GetAlienHeatMap(incubation.physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c("Alfalfa"))
-#GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
+GetAlienHeatMap(incubation.physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c("Alfalfa"))
+GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
 
 otus <- list(CompostAmend.otus, Control.otus)
 otus
@@ -62,9 +62,9 @@ alien.list
 aliens.venn <- venn(alien.list)
 aliens.venn
 aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
-aliens.detected
 incubated <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Compost"), incubation.physeq) %>%
-  filter_taxa(function(x) sum(x) > 1, T) 
+  filter_taxa(function(x) sum(x) > 5, T) %>%
+  transform_sample_counts(function(x) x / sum(x))
 incubated
 incubated.aliens <- prune_taxa(aliens.detected, incubated) 
 incubated.aliens
@@ -85,7 +85,8 @@ alien.list <- list(aliens, Alfalfa.otus)
 aliens.venn <- venn(alien.list)
 aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
 incubated <- prune_samples(sample_data(incubation.physeq)$treatment %in% c("Alfalfa"), incubation.physeq) %>%
-  filter_taxa(function(x) sum(x) > 1, T) 
+  filter_taxa(function(x) sum(x) > 5, T) %>%
+  transform_sample_counts(function(x) x / sum(x))
 incubated.aliens <- prune_taxa(aliens.detected, incubated) 
 sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
   arrange(day, replication) %>%
@@ -93,6 +94,6 @@ sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
   remove_rownames() 
 alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
                               sample.order = as.character(sample.order$i_id), 
-                              low = "#66CCFF", high = "#000033", na.value = "white")
+                              low = "white", high = "red", na.value = "gray")
 alien.heatmap
 
