@@ -102,7 +102,7 @@ Day_top10 <- function(physeq, trt, days){
   l21 <- names(sort(taxa_sums(d21), TRUE)[1:10])
   
   d35 <- subset_samples(trt, day == days[5]) 
-  l35 <- names(sort(taxa_sums(d21), TRUE)[1:10])
+  l35 <- names(sort(taxa_sums(d35), TRUE)[1:10])
   
   d49 <- subset_samples(trt, day == days[6]) 
   l49 <- names(sort(taxa_sums(d49), TRUE)[1:10])
