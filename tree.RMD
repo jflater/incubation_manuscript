@@ -15,8 +15,10 @@ BiocManager::install("ggtree", version = "3.8")
 BiocManager::install("phyloseq", version = "3.8")
 ```
 
+Merge tree file with the phyloseq object
 ```{r}
 library(tidyverse)
+library(phyloseq)
 library(ggtree)
 
 tree <- read.tree("data/tree.nwk")
@@ -28,3 +30,50 @@ inc_phy <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 inc_phy <- merge_phyloseq(inc_phy, tree)
 inc_phy
 ```
+
+Subset the object to incubated samples and rename some variables and rarefy to 6,000 based on 
+rarefactioncurve.R
+```{r}
+inc_phy
+#subset
+inc.physeq <- subset_samples(inc_phy, day %in% c("7",
+                                                        "14",
+                                                        "21",
+                                                        "35",
+                                                        "49",
+                                                        "97"))
+
+#Rename treatments to more informative titles
+data <- data.frame(sample_data(inc.physeq)) %>%
+  mutate(treatment = recode(treatment,
+                            'Control' = 'Reference',
+                            'CompAlfa' = 'Mix')) %>%
+  mutate(C_N = C_flash / N_flash, Inorganic_N = NH3 + NO3) %>%
+  mutate(TreatmentAndDay = paste(treatment, day))
+rownames(data) <- data$i_id
+sample_data(inc.physeq) <- data
+sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
+sample_data(inc.physeq)
+
+# Rarefy
+rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
+                                   rngseed = 15879966) %>%
+  filter_taxa(function(x) sum(x) >= 2, T) 
+  
+```
+
+Now let's plot an PCA ordination of the weighted unifrac distances, which uses the phylogenetic tree and considers the phylogenetic relationship between OTUs when calculating the distance matrix
+```{r}
+PCoA <- ordinate(rare6k.physeq, "PCoA", "unifrac", weighted = T)
+plot_ordination(rare6k.physeq, ord, color = "day", shape = "treatment")
+```
+```{r}
+NMDS <- ordinate(rare6k.physeq, "NMDS", "unifrac", weighted = T)
+plot_ordination(rare6k.physeq, NMDS, color = "day", shape = "treatment")
+```
+```{r}
+DPCoA <- ordinate(rare6k.physeq, "DPCoA")
+plot_ordination(rare6k.physeq, DPCoA, color = "day", shape = "treatment")
+```
+
+
