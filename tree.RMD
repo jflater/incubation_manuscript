@@ -1,25 +1,17 @@
 ---
-title: "Incubation Phylogenetic Tree Notebook"
-output: html_notebook
+output: 
+  html_document: 
+    highlight: textmate
+    theme: yeti
+    toc: yes
 ---
-We used Jin's python script to generate an aligned fasta file with the representative sequences for each OTU from the incubated microcosm soils and amendments. A phylogenetic tree was constructed using this aligned file using FastTree.       
-
-Download from HPCC using SCP
-```{bash eval = F}
-scp flaterj1@rsync.hpcc.msu.edu:/mnt/research/germs/jared/Incubation/raw/tree.nwk ./tree.nwk
-```
-```{r eval = F}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("ggtree", version = "3.8")
-BiocManager::install("phyloseq", version = "3.8")
-```
 
 Merge tree file with the phyloseq object
-```{r}
+```{r, warning=FALSE, echo=T, error=F, message=F, cache=T}
 library(tidyverse)
 library(phyloseq)
 library(ggtree)
+library(ggplot2)
 
 tree <- read.tree("data/tree.nwk")
 tree
@@ -33,8 +25,8 @@ inc_phy
 
 Subset the object to incubated samples and rename some variables and rarefy to 6,000 based on 
 rarefactioncurve.R
-```{r}
-inc_phy
+```{r, warning=FALSE, echo=T, error=F, message=F, cache=T}
+
 #subset
 inc.physeq <- subset_samples(inc_phy, day %in% c("7",
                                                         "14",
@@ -53,7 +45,7 @@ data <- data.frame(sample_data(inc.physeq)) %>%
 rownames(data) <- data$i_id
 sample_data(inc.physeq) <- data
 sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
-sample_data(inc.physeq)
+head(sample_data(inc.physeq))
 
 # Rarefy
 rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
@@ -63,17 +55,14 @@ rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
 ```
 
 Now let's plot an PCA ordination of the weighted unifrac distances, which uses the phylogenetic tree and considers the phylogenetic relationship between OTUs when calculating the distance matrix
-```{r}
+```{r, cache=T, warning=F, message=F}
 PCoA <- ordinate(rare6k.physeq, "PCoA", "wunifrac")
-plot_ordination(rare6k.physeq, PCoA, color = "day", shape = "treatment")
+plot_ordination(rare6k.physeq, PCoA, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
 ```
-```{r}
+```{r, cache=T, warning=F, message=F}
 NMDS <- ordinate(rare6k.physeq, "NMDS", "wunifrac")
-plot_ordination(rare6k.physeq, NMDS, color = "day", shape = "treatment")
+plot_ordination(rare6k.physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
 ```
-```{r}
-DPCoA <- ordinate(rare6k.physeq, "DPCoA")
-plot_ordination(rare6k.physeq, DPCoA, color = "day", shape = "treatment")
-```
+
 
 
