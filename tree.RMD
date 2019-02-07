@@ -64,11 +64,11 @@ rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
 
 Now let's plot an PCA ordination of the weighted unifrac distances, which uses the phylogenetic tree and considers the phylogenetic relationship between OTUs when calculating the distance matrix
 ```{r}
-PCoA <- ordinate(rare6k.physeq, "PCoA", "unifrac", weighted = T)
-plot_ordination(rare6k.physeq, ord, color = "day", shape = "treatment")
+PCoA <- ordinate(rare6k.physeq, "PCoA", "wunifrac")
+plot_ordination(rare6k.physeq, PCoA, color = "day", shape = "treatment")
 ```
 ```{r}
-NMDS <- ordinate(rare6k.physeq, "NMDS", "unifrac", weighted = T)
+NMDS <- ordinate(rare6k.physeq, "NMDS", "wunifrac")
 plot_ordination(rare6k.physeq, NMDS, color = "day", shape = "treatment")
 ```
 ```{r}
