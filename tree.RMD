@@ -64,5 +64,8 @@ NMDS <- ordinate(rare6k.physeq, "NMDS", "wunifrac")
 plot_ordination(rare6k.physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
 ```
 
+```{r}
+
+```
 
 

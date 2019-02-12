@@ -2,9 +2,17 @@ library(phyloseq)
 library(vegan)
 library(tidyverse)
 library(ape)
-inc.raw.physeq <- readRDS("Data/incubation_physeq_Aug18.RDS")
+library(ggtree)
+library(ggplot2)
 
-inc.physeq <- subset_samples(inc.raw.physeq, day %in% c("7",
+tree <- read.tree("data/tree.nwk")
+tree
+inc_phy <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+
+# Add the tree file to the phyloseq object
+inc_phy <- merge_phyloseq(inc_phy, tree)
+inc_phy
+inc.physeq <- subset_samples(inc_phy, day %in% c("7",
                                                         "14",
                                                         "21",
                                                         "35",
@@ -101,4 +109,4 @@ rare6k.physeq.data$response.group[rare6k.physeq.data$day == "0"] <- "baseline"
 rare6k.physeq.data$response.group[rare6k.physeq.data$day %in% c("7", "14", "21")] <- "early" 
 rare6k.physeq.data$response.group[rare6k.physeq.data$day %in% c("35", "49", "97")] <- "late" 
 sample_data(rare6k.physeq) <- rare6k.physeq.data
-
+saveRDS(rare6k.physeq, "data/IncPhyseqRareClusteredTree")

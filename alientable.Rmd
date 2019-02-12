@@ -1,0 +1,142 @@
+---
+title: "Alien Table"
+author: "Jared"
+date: "February 12, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(phyloseq)
+library(tidyverse)
+```
+
+Table with # of aliens for each treatment and what period of the incubation they were detected, early/late or throughout. 
+
+The lists of alien OTUs detected in amended microcosms was generated with <link>, we can load those lists along with the phyloseq object with clustering information from <link>:
+```{r}
+alf.aliens <- readRDS("data/alf.aliens.rds")
+comp.aliens <- readRDS("data/comp.aliens.rds")
+mix.aliens <- readRDS("data/mix.aliens.rds")
+# Read in the phylsoeq object from the clustering script
+physeq <- readRDS("data/IncPhyseqRareClusteredTree")
+```
+```{r, warning=F, echo=F}
+alf <- prune_samples(sample_data(physeq)$treatment %in% c("Alfalfa"), physeq) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+early.alf <- prune_samples(sample_data(alf)$response.group %in% c("early"), alf) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+late.alf <- prune_samples(sample_data(alf)$response.group %in% c("late"), alf) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+
+number.aliens.early.alf <- prune_taxa(as.character(alf.aliens), early.alf) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+number.aliens.late.alf <- prune_taxa(as.character(alf.aliens), late.alf) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+number.aliens.total.alf <- prune_taxa(as.character(alf.aliens), alf) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+print("Number of alfalfa alien OTUs detected in all alfalfa")
+number.aliens.total.alf
+print("Total number of OTUs detected in all alfalfa")
+nrow(otu_table(alf))
+print("Number of alfalfa alien OTUs detected in early alfalfa")
+number.aliens.early.alf
+print("Total number of OTUs detected in early alfalfa")
+nrow(otu_table(early.alf))
+print("Number of alfalfa alien OTUs detected in late alfalfa")
+number.aliens.late.alf
+print("Total number of OTUs detected in late alfalfa")
+nrow(otu_table(late.alf))
+```
+```{r, warning=F, echo=F}
+comp <- prune_samples(sample_data(physeq)$treatment %in% c("Compost"), physeq) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+early.comp <- prune_samples(sample_data(comp)$response.group %in% c("early"), comp) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+late.comp <- prune_samples(sample_data(comp)$response.group %in% c("late"), comp) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+
+number.aliens.early.comp <- prune_taxa(as.character(comp.aliens), early.comp) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+number.aliens.late.comp <- prune_taxa(as.character(comp.aliens), late.comp) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+number.aliens.total.comp <- prune_taxa(as.character(comp.aliens), comp) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+print("Number of Compost alien OTUs detected in all Compost")
+number.aliens.total.comp
+print("Total number of OTUs detected in all Compost")
+nrow(otu_table(comp))
+print("Number of Compost alien OTUs detected in early Compost")
+number.aliens.early.comp
+print("Total number of OTUs detected in early Compost")
+nrow(otu_table(early.comp))
+print("Number of Compost alien OTUs detected in late Compost")
+number.aliens.late.comp
+print("Total number of OTUs detected in late Compost")
+nrow(otu_table(late.comp))
+```
+```{r, warning=F, echo=F}
+mix <- prune_samples(sample_data(physeq)$treatment %in% c("Mix"), physeq) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+early.mix <- prune_samples(sample_data(mix)$response.group %in% c("early"), mix) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+late.mix <- prune_samples(sample_data(mix)$response.group %in% c("late"), mix) %>%
+  filter_taxa(function(x) sum(x) > 1, T)
+
+number.aliens.early.mix <- prune_taxa(as.character(mix.aliens), early.mix) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+number.aliens.late.mix <- prune_taxa(as.character(mix.aliens), late.mix) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+number.aliens.total.mix <- prune_taxa(as.character(mix.aliens), mix) %>%
+  filter_taxa(function(x) sum(x) > 1, T) %>%
+  otu_table() %>%
+  nrow()
+
+print("Number of Mix alien OTUs detected in all Mix")
+number.aliens.total.mix
+print("Total number of OTUs detected in all Mix")
+nrow(otu_table(mix))
+print("Number of Mix alien OTUs detected in early Mix")
+number.aliens.early.mix
+print("Total number of OTUs detected in early Mix")
+nrow(otu_table(early.mix))
+print("Number of Mix alien OTUs detected in late Mix")
+number.aliens.late.mix
+print("Total number of OTUs detected in late Mix")
+nrow(otu_table(late.mix))
+```
+```{r}
+library(knitr)
+a <- c("Alfalfa", number.aliens.total.alf, number.aliens.early.alf, number.aliens.late.alf)
+b <- c("Compost", number.aliens.total.comp, number.aliens.early.comp, number.aliens.late.comp)
+c <- c("Mix", number.aliens.total.mix, number.aliens.early.mix, number.aliens.late.mix)
+x <- as.data.frame(rbind(a,b,c))
+colnames(x) <- c("Treatment", "Throughout", "Eary", "Late")
+rownames(x) <- NULL
+kable(x, caption = "Number of OTUs considered aliens detected in each treatment")
+```
+
