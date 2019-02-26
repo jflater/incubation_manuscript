@@ -6,6 +6,7 @@ output:
   html_document:
     toc: yes
     toc_float: yes
+    code_folding: hide
   pdf_document:
     toc: yes
 ---
@@ -21,6 +22,7 @@ library(phyloseq)
 library(vegan)
 library(ggplot2)
 library(ggtree)
+library(gplots)
 ```
 # Results
 
@@ -37,7 +39,8 @@ summary.shannon.df <- summarySE(shannon.df, measurevar = "value", groupvars = c(
 pd <- position_dodge(0.2) # move them .05 to the left and right
 ggplot(summary.shannon.df, aes(x=day, y=value, colour=treatment)) + 
     geom_errorbar(aes(ymin=value-se, ymax=value+se), width=.1, position=pd) +
-    geom_point(position=pd)
+    geom_point(position=pd) + 
+    ggtitle("Shannon diversity")
 ```
 
 ## Beta Diversity
@@ -187,5 +190,139 @@ kable(x, caption = "Number of OTUs considered aliens detected in each treatment"
 ```
 
 ## Alien Heatmaps
+Function to get a list of OTUs from a sample type
+```{r}
+GetOTUs <- function(physeq, samples) {
+    prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
+    filter_taxa(function(x) sum(x) > 1, T) %>%
+    tax_table() %>%
+    row.names()
+}
+```
+
+Using function to generate list of OTUs from all starting soil, incubated soils and amendments
+```{r}
+physeq.raw <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+# Incubated samples:
+Alfalfa.otus <- GetOTUs(physeq.raw, c("Alfalfa"))
+Compost.otus <- GetOTUs(physeq.raw, c("Compost"))
+CompAlfa.otus <- GetOTUs(physeq.raw, c("CompAlfa"))
+Control.otus <- GetOTUs(physeq.raw, c("Control"))
+# Amendment samples:
+AlfalfaAmend.otus <- GetOTUs(physeq.raw, c("AlfalfaAmend"))
+CompostAmend.otus <- GetOTUs(physeq.raw, c("CompostAmend"))
+# Soil sample:
+AlfalfaSoil.otus <- GetOTUs(physeq.raw, c("AlfalfaSoil"))
+```
+
+```{r, warning=F}
+GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus, samples){
+  otus <- list(alien_otus, control_otus) 
+  print("Looking for aliens between amendment and control soil")
+  venn <- venn(otus)
+  alf.aliens <- attr(venn, "intersections")$A
+  aliens <- list(alf.aliens, recieving_otus)
+  print("Detecting aliens in amended soil")
+  aliens.venn <- venn(aliens)
+  aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
+  incubated <- prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
+    filter_taxa(function(x) sum(x) > 5, T) %>%
+    transform_sample_counts(function(x) x / sum(x)) 
+  incubated.aliens <- prune_taxa(aliens.detected, incubated)
+  sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
+    arrange(day, replication) %>%
+    select(i_id) %>%
+    remove_rownames()   
+  alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  sample.order = as.character(sample.order$i_id), 
+                                  low = "#66CCFF", high = "#000033", na.value = "white")
+  alien.heatmap
+}
+```
+
+```{r, warning=FALSE}
+alf.heatmap <- GetAlienHeatMap(physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c("Alfalfa"))
+alf.heatmap
+```
+```{r, warning=FALSE}
+comp.heatmap <- GetAlienHeatMap(physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
+comp.heatmap
+```
+
+I didn't extract DNA from a mixed sample of compost and alfalfa, to get the list of potential aliens, we will combine the two lists from alfalfa and compost.
+
+```{r, warning=FALSE}
+mix <- c(AlfalfaAmend.otus, CompostAmend.otus)
+mix.heatmap <- GetAlienHeatMap(physeq, Control.otus, mix, CompAlfa.otus, c("Mix"))
+mix.heatmap
+```
+
+The relative abundance of the alien OTUs through the incubation is relatively low, but different between treatments. Could low abundance OTUs be drivers in this situation? We should compare the relative abundance of the dominant OTUs from each treatment.
+
+Let's make another heatmap, this one will have a list of OTUs from a treatment that is composed of the top ten OTUs by relative abundance from each day. 
+
+```{r, warning=FALSE}
+Day_top10 <- function(physeq, trt, days){
+  trt <- prune_samples(sample_data(physeq)$treatment %in% c(trt), physeq)
+  
+  d0 <- subset_samples(trt, day == days[1]) 
+  l0 <- names(sort(taxa_sums(d0), TRUE)[1:10])
+  
+  d7 <- subset_samples(trt, day == days[2]) 
+  l7 <- names(sort(taxa_sums(d7), TRUE)[1:10])   
+  
+  d14 <- subset_samples(trt, day == days[3]) 
+  l14 <- names(sort(taxa_sums(d14), TRUE)[1:10])   
+  
+  d21 <- subset_samples(trt, day == days[4]) 
+  l21 <- names(sort(taxa_sums(d21), TRUE)[1:10])
+  
+  d35 <- subset_samples(trt, day == days[5]) 
+  l35 <- names(sort(taxa_sums(d35), TRUE)[1:10])
+  
+  d49 <- subset_samples(trt, day == days[6]) 
+  l49 <- names(sort(taxa_sums(d49), TRUE)[1:10])
+  
+  d97 <- subset_samples(trt, day == days[7])
+  l97 <- names(sort(taxa_sums(d97), TRUE)[1:10])
+  list <- c(l0, l7, l14, l21, l35, l49, l97)
+  list
+  phy <- prune_taxa(list, trt) %>%
+      filter_taxa(function(x) sum(x) > 5, T) %>%
+      transform_sample_counts(function(x) x / sum(x))
+  sample.order <- as.data.frame(sample_data(phy)) %>%
+    arrange(day, replication) %>%
+    select(i_id) %>%
+    remove_rownames()   
+  heatmap <- plot_heatmap(phy, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  sample.order = as.character(sample.order$i_id), 
+                                  low = "#66CCFF", high = "#000033", na.value = "white")
+  heatmap
+}
+```
+
+Not rarefied for these heatmaps:
+```{r, warning=FALSE}
+days <- c("0", "7", "14", "21", "35", "49", "97")
+alf <- Day_top10(physeq.raw, c("Alfalfa"), days)
+alf
+```
+
+Compost:
+```{r, warning=FALSE}
+comp <- Day_top10(physeq.raw, c("Compost"), days)
+comp
+```
+
+Mix:
+```{r, warning=FALSE}
+mix <- Day_top10(physeq.raw, c("CompAlfa"), days)
+mix
+```
+
+What are the common top OTUs from the three treatments?
+```{r}
+venn(list("Alfalfa" = levels(alf$data$OTU), "Compost" = levels(comp$data$OTU), "Mix" = levels(mix$data$OTU)))
+```
 
 
