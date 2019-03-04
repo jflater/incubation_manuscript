@@ -17,3 +17,11 @@ plyr
 knitr
 treeio
 gplots
+nlme
+emmeans
+magrittr
+ggpubr
+agricolae
+broom
+xtable
+bindrcpp
