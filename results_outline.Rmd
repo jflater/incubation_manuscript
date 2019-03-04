@@ -220,22 +220,22 @@ trt.PCoA.wunifrac
 raw.day.PCoA.wunifrac
 raw.trt.PCoA.wunifrac
 
-tiff("Figures/day.PCoA.wunifrac.tif",height=4,width=9,units='in',res=300)
+png("Figures/day.PCoA.wunifrac.png",height=4,width=9,units='in',res=300)
 day.PCoA.wunifrac + 
   ggtitle("PCoA of weighted Unifrac distances on days, no amendments")
 dev.off()
 
-tiff("Figures/trt.PCoA.wunifrac.tif",height=4,width=9,units='in',res=300)
+png("Figures/trt.PCoA.wunifrac.png",height=4,width=9,units='in',res=300)
 trt.PCoA.wunifrac + 
   ggtitle("PCoA of weighted Unifrac distances on treatments, no amendments")
 dev.off()
 
-tiff("Figures/raw.day.PCoA.wunifrac.tif",height=4,width=9,units='in',res=300)
+png("Figures/raw.day.PCoA.wunifrac.png",height=4,width=9,units='in',res=300)
 raw.day.PCoA.wunifrac + 
   ggtitle("PCoA of weighted Unifrac distances on days")
 dev.off()
 
-tiff("Figures/raw.trt.PCoA.wunifrac.tif",height=4,width=9,units='in',res=300)
+png("Figures/raw.trt.PCoA.wunifrac.png",height=4,width=9,units='in',res=300)
 day.PCoA.wunifrac + 
   ggtitle("PCoA of weighted Unifrac distances on treatments")
 dev.off()
