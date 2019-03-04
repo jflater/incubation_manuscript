@@ -20,4 +20,5 @@ object, note that day is not a factor and that this has not been
 rarefied.
 
 ![](./Figures/raw.day.PCoA.wunifrac.png)
+
 ![](./Figures/raw.trt.PCoA.wunifrac.png)
