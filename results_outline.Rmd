@@ -236,7 +236,7 @@ raw.day.PCoA.wunifrac +
 dev.off()
 
 png("Figures/raw.trt.PCoA.wunifrac.png",height=4,width=9,units='in',res=300)
-day.PCoA.wunifrac + 
+raw.trt.PCoA.wunifrac + 
   ggtitle("PCoA of weighted Unifrac distances on treatments")
 dev.off()
 ```
