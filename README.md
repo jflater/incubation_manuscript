@@ -14,4 +14,4 @@ NMDS of all amendments and baseline soils and time
 First ordination using weighted unifrac and PCoA, there are no
 amendments and reads have been rarified to 6k
 
-![](./Figures/day.PCoA.wunifrac.tif){ width = 50%}
+<embed src="./Figures/day.PCoA.wunifrac.tif" width="250" />
