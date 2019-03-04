@@ -248,11 +248,14 @@ NMDS.raw <- ordinate(physeq.raw, "NMDS", "wunifrac")
 
 day.NMDS.wunifrac <- plot_ordination(physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
 trt.NMDS.wunifrac <- plot_ordination(physeq, NMDS, color = "treatment") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = treatment))
-raw.day.NMDS.wunifrac <- plot_ordination(physeq.raw, NMDS.raw, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
+
+raw.day.NMDS.wunifrac <- plot_ordination(physeq.raw, NMDS.raw) + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2)
 raw.trt.NMDS.wunifrac <- plot_ordination(physeq.raw, NMDS.raw, color = "treatment") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = treatment))
 
 day.NMDS.wunifrac
 trt.NMDS.wunifrac
+## Two below are broken
+print("last two figure are broken")
 raw.day.NMDS.wunifrac
 raw.trt.NMDS.wunifrac
 
