@@ -8,7 +8,7 @@
 How much does the soil microbiome/nutrients change from amendment?
 ==================================================================
 
-NMDS of all amendments and baseline soils and time
+PCoA of all amendments and baseline soils and time
 --------------------------------------------------
 
 First ordination using weighted unifrac and PCoA, there are no
@@ -22,3 +22,16 @@ rarefied.
 ![](./Figures/raw.day.PCoA.wunifrac.png)
 
 ![](./Figures/raw.trt.PCoA.wunifrac.png)
+
+NMDS of all amendments, baseline soils and time
+-----------------------------------------------
+
+Same as above, but now I used NMDS instead of PCoA for the ordination  
+![](./Figures/day.NMDS.wunifrac.png)
+![](./Figures/trt.NMDS.wunifrac.png) Second ordinations using the raw
+object, note that day is not a factor and that this has not been
+rarefied.
+
+![](./Figures/raw.day.NMDS.wunifrac.png)
+
+![](./Figures/raw.trt.NMDS.wunifrac.png)

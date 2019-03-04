@@ -244,8 +244,37 @@ dev.off()
 ### NMDS
 ```{r, cache=TRUE}
 NMDS <- ordinate(physeq, "NMDS", "wunifrac")
-plot_ordination(physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
-plot_ordination(physeq, NMDS, color = "treatment") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = treatment))
+NMDS.raw <- ordinate(physeq.raw, "NMDS", "wunifrac")
+
+day.NMDS.wunifrac <- plot_ordination(physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
+trt.NMDS.wunifrac <- plot_ordination(physeq, NMDS, color = "treatment") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = treatment))
+raw.day.NMDS.wunifrac <- plot_ordination(physeq.raw, NMDS.raw, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
+raw.trt.NMDS.wunifrac <- plot_ordination(physeq.raw, NMDS.raw, color = "treatment") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = treatment))
+
+day.NMDS.wunifrac
+trt.NMDS.wunifrac
+raw.day.NMDS.wunifrac
+raw.trt.NMDS.wunifrac
+
+png("Figures/day.NMDS.wunifrac.png",height=4,width=9,units='in',res=300)
+day.NMDS.wunifrac + 
+  ggtitle("NMDS of weighted Unifrac distances on days, no amendments")
+dev.off()
+
+png("Figures/trt.NMDS.wunifrac.png",height=4,width=9,units='in',res=300)
+trt.NMDS.wunifrac + 
+  ggtitle("NMDS of weighted Unifrac distances on treatments, no amendments")
+dev.off()
+
+png("Figures/raw.day.NMDS.wunifrac.png",height=4,width=9,units='in',res=300)
+raw.day.NMDS.wunifrac + 
+  ggtitle("NMDS of weighted Unifrac distances on days")
+dev.off()
+
+png("Figures/raw.trt.NMDS.wunifrac.png",height=4,width=9,units='in',res=300)
+raw.trt.NMDS.wunifrac + 
+  ggtitle("NMDS of weighted Unifrac distances on treatments")
+dev.off()
 ```
 
 ## Aliens   
