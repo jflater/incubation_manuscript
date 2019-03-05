@@ -6,7 +6,8 @@ library(emmeans)
 library(ggpubr)
 library(agricolae)
 library(broom)
-inc.raw.physeq <- readRDS("Data/incubation_physeq_Aug18.RDS")
+library(xtable)
+inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
 inc.physeq <- subset_samples(inc.raw.physeq, day %in% c("7",
                                                         "14",
@@ -33,7 +34,7 @@ inc.model.data <- lme(Inorganic_N~treatment * day, random=~1|replication
                       , data = data
                       , weights = varIdent(form= ~1|day*treatment)
                       , control = lmeControl(opt = "optim", msVerbose = TRUE))
-
+anova(summary(inc.model.data))
 em <- emmeans(inc.model.data, c("day", "treatment"), data = data)
 
 sum_em <- summary(em)
@@ -57,7 +58,7 @@ p <- ggplot(data = data, aes(x = day, y = Inorganic_N     )) +
     plot.title = element_text(face = "bold"),
     strip.text.x=element_text(size=15)
   )
-tiff("Figures/inorganic_N_plot.tif",height=5,width=5,units='in',res=300)
+png("Figures/inorganic_N_plot.png",height=5,width=5,units='in',res=300)
 p
 dev.off()
 p
@@ -110,7 +111,7 @@ p <- ggplot(data = sum_em2, aes(x = day, y = estimate)) +
     plot.title = element_text(face = "bold"),
     strip.text.x=element_text(size=15)
   )
-tiff("Figures/inorganic_N_plot_diff.tif",height=5,width=8,units='in',res=300)
+png("Figures/inorganic_N_plot_diff.png",height=5,width=8,units='in',res=300)
 p
 dev.off()
 p
@@ -118,10 +119,10 @@ p
 
 
 
-data <- data %>%
+data7 <- data %>%
   filter(day == 7) 
 
-g <-ggboxplot(data = data,x = "treatment"
+g <-ggboxplot(data = data7,x = "treatment"
               , y = "Inorganic_N", color = "treatment"
               , legend = "none") +
   ylab("Inorganic Nitrogen") +
@@ -132,8 +133,8 @@ g <-ggboxplot(data = data,x = "treatment"
   stat_compare_means(aes(label = ..p.signif..), method = "t.test", ref.group = "Reference", paired = TRUE) +
   stat_compare_means(method = "anova", label.y = max(data$Inorganic_N))
 g
-# linear model
-lm <- lm(Inorganic_N ~ treatment, data = data)
+# linear model fro day 7
+lm <- lm(Inorganic_N ~ treatment, data = data7)
 lm.summary <- summary(lm)
 # ANOVA
 av <- aov(lm)

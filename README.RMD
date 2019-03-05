@@ -28,4 +28,6 @@ Same as above, but now I used NMDS instead of PCoA for the ordination
 ![](./Figures/day.NMDS.wunifrac.png)
 ![](./Figures/trt.NMDS.wunifrac.png)
 
-# 
+# Inorganic nitrogen 
+![](./Figures/inorganic_N_plot.png)
+![](./Figures/inorganic_N_plot_diff.png)
