@@ -1,7 +1,9 @@
 library(phyloseq)
 library(vegan)
 library(tidyverse)
-inc.raw.physeq <- readRDS("Data/incubation_physeq_Aug18.RDS")
+library(ggplot2)
+library(ggpubr)
+inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
 inc.physeq <- subset_samples(inc.raw.physeq, day %in% c("7",
                                                         "14",
@@ -67,7 +69,7 @@ relllll <- PlotRelativeAbundance(RelativeAbundanceDf(rare.merged)) +
   rotate_x_text(angle = 45)
 relllll
 
-tiff("Figures/rela_abund_input.tif",height=5,width=6,units='in',res=300)
+png("Figures/rela_abund.png",height=5,width=6,units='in',res=300)
 relllll
 dev.off()
 

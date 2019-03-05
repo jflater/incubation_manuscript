@@ -21,3 +21,6 @@ png("Figures/shannon.diversity.png",height=4,width=9,units='in',res=300)
 shannon.diversity + 
   ggtitle("Shannon diversity for incubated microcosm, rarefied to 6k")
 dev.off()
+
+# Diversity of ammendments
+amendments <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")

@@ -7,7 +7,7 @@ library(gridExtra)
 # This script used to generate relative abundance bar plots for the incubation inputs
 # tps is variable name for the temporary physeq object
 # Read in the phyloseq object, raw object from mothur, see code file mothur_to_phyloseq.R
-inc.raw.physeq <- readRDS("Data/incubation_physeq_Aug18.RDS")
+inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
 # We will be characterizing the ammendments and starting soil, exclude all else
 inc.inputs <- subset_samples(inc.raw.physeq, treatment %in% c("AlfalfaAmend", 
@@ -44,7 +44,7 @@ d <- td[c("2mm.dry.alfalfa.soil", "2mm.dry.compost7", "2mm.dry.alfalfa.plant3"),
 d
 row.names(d) <- c("Soil", "Compost", "Alfalfa")
 
-td.table <- xtable(d)
+td.table <- kable(d)
 # table of characteristics
 td.table
 
@@ -76,7 +76,7 @@ input.PCoA
 
 # Stats for input.PCoA
 input.PCoA.stats <- adonis(physeq.dist ~ treatment, data = data.frame(sample_data(tps)))
-tiff("Figures/input_PCoA_stats.tif",height=2,width=9,units='in',res=1200)
+png("Figures/input_PCoA_stats.png",height=2,width=9,units='in',res=300)
 grid.table(input.PCoA.stats$aov.tab)
 dev.off()
 
@@ -108,6 +108,6 @@ sample_data(tps.merged)$treatment <- levels(sample_data(tps)$treatment)
 
 plot <- PlotRelativeAbundance(RelativeAbundanceDf(tps.merged)) + 
   scale_x_discrete(labels = treatment_names)
-tiff("Figures/rela_abund_input.tif",height=4,width=6,units='in',res=1200)
+png("Figures/rela_abund_input.png",height=4,width=6,units='in',res=300)
 plot
 dev.off()

@@ -5,11 +5,10 @@
 
 ![](./images/giphy.gif)
 
-How much does the soil microbiome/nutrients change from amendment?
-==================================================================
+### How much does the soil microbiome/nutrients change from amendment?
 
 PCoA of all amendments and baseline soils and time
-==================================================
+--------------------------------------------------
 
 First ordination using weighted unifrac and PCoA, there are no
 amendments and reads have been rarified to 6k
@@ -26,7 +25,7 @@ and that this has not been rarefied.
 ![](./Figures/raw.trt.PCoA.wunifrac.png)
 
 NMDS of all amendments, baseline soils and time
-===============================================
+-----------------------------------------------
 
 Same as above, but now I used NMDS instead of PCoA for the ordination  
 ![](./Figures/day.NMDS.wunifrac.png)
@@ -34,13 +33,35 @@ Same as above, but now I used NMDS instead of PCoA for the ordination
 ![](./Figures/trt.NMDS.wunifrac.png)
 
 Shannon Diversity of incubated microcosms.
-==========================================
+------------------------------------------
 
 There is an OTU in the compost day 14 samples that has super high
 abundance, likely needs removed. ![](./Figures/shannon.diversity.png)
 
+Relative Abundance of phyla in the inputs and the nutrient profiles of the inputs
+---------------------------------------------------------------------------------
+
+Nutrients contained in inputs: | Input| N\_flash| C\_flash| NH3| NO3|
+Inorganic\_N| C\_N|
+|:-------|--------:|--------:|--------:|--------:|-----------:|--------:|
+|Soil | 0.253000| 3.17800| 2.17300| 1.165333| 3.338333| 12.56126|
+|Compost | 1.168000| 33.84267| 12.56000| 1.348000| 13.908000| 28.97489|
+|Alfalfa | 2.067333| 41.72433| 20.24589| 5.279778| 25.525667| 20.18268|
+
+![](./Figures/rela_abund_input.png) | | Df| SumsOfSqs| MeanSqs| F.Model|
+R2| Pr(&gt;F)|
+|:---------|--:|---------:|---------:|--------:|---------:|------:|
+|treatment | 2| 3.5261637| 1.7630819| 74.06469| 0.9367606| 0.001|
+|Residuals | 10| 0.2380462| 0.0238046| NA| 0.0632394| NA| |Total | 12|
+3.7642099| NA| NA| 1.0000000| NA|
+
+Relative Abundance of phyla
+---------------------------
+
+![](./Figures/rela_abund.png)
+
 Inorganic nitrogen
-==================
+------------------
 
 ![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
