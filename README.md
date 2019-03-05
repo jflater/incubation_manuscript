@@ -41,19 +41,95 @@ abundance, likely needs removed. ![](./Figures/shannon.diversity.png)
 Relative Abundance of phyla in the inputs and the nutrient profiles of the inputs
 ---------------------------------------------------------------------------------
 
-Nutrients contained in inputs: | Input| N\_flash| C\_flash| NH3| NO3|
-Inorganic\_N| C\_N|
-|:-------|--------:|--------:|--------:|--------:|-----------:|--------:|
-|Soil | 0.253000| 3.17800| 2.17300| 1.165333| 3.338333| 12.56126|
-|Compost | 1.168000| 33.84267| 12.56000| 1.348000| 13.908000| 28.97489|
-|Alfalfa | 2.067333| 41.72433| 20.24589| 5.279778| 25.525667| 20.18268|
+Nutrients contained in inputs:
 
-![](./Figures/rela_abund_input.png) | | Df| SumsOfSqs| MeanSqs| F.Model|
-R2| Pr(&gt;F)|
-|:---------|--:|---------:|---------:|--------:|---------:|------:|
-|treatment | 2| 3.5261637| 1.7630819| 74.06469| 0.9367606| 0.001|
-|Residuals | 10| 0.2380462| 0.0238046| NA| 0.0632394| NA| |Total | 12|
-3.7642099| NA| NA| 1.0000000| NA|
+<table>
+<thead>
+<tr class="header">
+<th align="left">Input</th>
+<th align="right">N_flash</th>
+<th align="right">C_flash</th>
+<th align="right">NH3</th>
+<th align="right">NO3</th>
+<th align="right">Inorganic_N</th>
+<th align="right">C_N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Soil</td>
+<td align="right">0.253000</td>
+<td align="right">3.17800</td>
+<td align="right">2.17300</td>
+<td align="right">1.165333</td>
+<td align="right">3.338333</td>
+<td align="right">12.56126</td>
+</tr>
+<tr class="even">
+<td align="left">Compost</td>
+<td align="right">1.168000</td>
+<td align="right">33.84267</td>
+<td align="right">12.56000</td>
+<td align="right">1.348000</td>
+<td align="right">13.908000</td>
+<td align="right">28.97489</td>
+</tr>
+<tr class="odd">
+<td align="left">Alfalfa</td>
+<td align="right">2.067333</td>
+<td align="right">41.72433</td>
+<td align="right">20.24589</td>
+<td align="right">5.279778</td>
+<td align="right">25.525667</td>
+<td align="right">20.18268</td>
+</tr>
+</tbody>
+</table>
+
+![](./Figures/rela_abund_input.png)
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Df</th>
+<th align="right">SumsOfSqs</th>
+<th align="right">MeanSqs</th>
+<th align="right">F.Model</th>
+<th align="right">R2</th>
+<th align="right">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">treatment</td>
+<td align="right">2</td>
+<td align="right">3.5261637</td>
+<td align="right">1.7630819</td>
+<td align="right">74.06469</td>
+<td align="right">0.9367606</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">Residuals</td>
+<td align="right">10</td>
+<td align="right">0.2380462</td>
+<td align="right">0.0238046</td>
+<td align="right">NA</td>
+<td align="right">0.0632394</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">12</td>
+<td align="right">3.7642099</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">1.0000000</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
 
 Relative Abundance of phyla
 ---------------------------

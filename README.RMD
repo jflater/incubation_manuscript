@@ -38,6 +38,7 @@ There is an OTU in the compost day 14 samples that has super high abundance, lik
 
 ## Relative Abundance of phyla in the inputs and the nutrient profiles of the inputs    
 Nutrients contained in inputs:
+
 |   Input|  N_flash|  C_flash|      NH3|      NO3| Inorganic_N|      C_N|
 |:-------|--------:|--------:|--------:|--------:|-----------:|--------:|
 |Soil    | 0.253000|  3.17800|  2.17300| 1.165333|    3.338333| 12.56126|
@@ -45,6 +46,7 @@ Nutrients contained in inputs:
 |Alfalfa | 2.067333| 41.72433| 20.24589| 5.279778|   25.525667| 20.18268|
 
 ![](./Figures/rela_abund_input.png)
+
 |          | Df| SumsOfSqs|   MeanSqs|  F.Model|        R2| Pr(>F)|
 |:---------|--:|---------:|---------:|--------:|---------:|------:|
 |treatment |  2| 3.5261637| 1.7630819| 74.06469| 0.9367606|  0.001|
