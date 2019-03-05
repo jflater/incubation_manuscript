@@ -35,3 +35,6 @@ Inorganic nitrogen
 
 ![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
+
+Anova results on the linear mixed effect model defined by:
+Inorganic\_N~treatment \* day, random=~1|replication

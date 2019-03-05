@@ -31,3 +31,19 @@ Same as above, but now I used NMDS instead of PCoA for the ordination
 # Inorganic nitrogen 
 ![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
+
+Anova results on the linear mixed effect model defined by: Inorganic_N~treatment * day, random=~1|replication
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+ & numDF & denDF & F-value & p-value \\ 
+  \hline
+(Intercept) &   1 & 253.00 & 5557.05 & 0.00 \\ 
+  treatment &   3 & 253.00 & 10708.15 & 0.00 \\ 
+  day &   5 & 253.00 & 2539.95 & 0.00 \\ 
+  treatment:day &  15 & 253.00 & 488.15 & 0.00 \\ 
+   \hline
+\end{tabular}
+\end{table}
