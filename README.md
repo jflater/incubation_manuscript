@@ -55,28 +55,28 @@ Inorganic\_N~treatment \* day, random=~1|replication
 <td align="right">1</td>
 <td align="right">253</td>
 <td align="right">5557.0515</td>
-<td align="right">0</td>
+<td align="right">&lt;.0001</td>
 </tr>
 <tr class="even">
 <td align="left">treatment</td>
 <td align="right">3</td>
 <td align="right">253</td>
 <td align="right">10708.1487</td>
-<td align="right">0</td>
+<td align="right">&lt;.0001</td>
 </tr>
 <tr class="odd">
 <td align="left">day</td>
 <td align="right">5</td>
 <td align="right">253</td>
 <td align="right">2539.9503</td>
-<td align="right">0</td>
+<td align="right">&lt;.0001</td>
 </tr>
 <tr class="even">
 <td align="left">treatment:day</td>
 <td align="right">15</td>
 <td align="right">253</td>
 <td align="right">488.1453</td>
-<td align="right">0</td>
+<td align="right">&lt;.0001</td>
 </tr>
 </tbody>
 </table>
