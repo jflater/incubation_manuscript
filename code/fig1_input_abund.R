@@ -77,7 +77,7 @@ input.PCoA
 # Stats for input.PCoA
 input.PCoA.stats <- adonis(physeq.dist ~ treatment, data = data.frame(sample_data(tps)))
 png("Figures/input_PCoA_stats.png",height=2,width=9,units='in',res=300)
-grid.table(input.PCoA.stats$aov.tab)
+kable(input.PCoA.stats$aov.tab)
 dev.off()
 
 
