@@ -34,7 +34,7 @@ inc.model.data <- lme(Inorganic_N~treatment * day, random=~1|replication
                       , data = data
                       , weights = varIdent(form= ~1|day*treatment)
                       , control = lmeControl(opt = "optim", msVerbose = TRUE))
-anova(summary(inc.model.data))
+xtable(anova(summary(inc.model.data)))
 em <- emmeans(inc.model.data, c("day", "treatment"), data = data)
 
 sum_em <- summary(em)
