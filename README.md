@@ -28,11 +28,10 @@ NMDS of all amendments, baseline soils and time
 
 Same as above, but now I used NMDS instead of PCoA for the ordination  
 ![](./Figures/day.NMDS.wunifrac.png)
-![](./Figures/trt.NMDS.wunifrac.png)
-
-Inorganic nitrogen
-==================
-
+![](./Figures/trt.NMDS.wunifrac.png) \# Shannon Diversity of incubated
+microcosms. There is an OTU in the compost day 14 samples that has super
+high abundance, likely needs removed.
+![](./Figures/shannon.diversity.png) \# Inorganic nitrogen
 ![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
 
