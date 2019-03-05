@@ -47,6 +47,8 @@ Nutrients contained in inputs:
 
 ![](./Figures/rela_abund_input.png)
 
+Were the treatments significantly different? Adonis on the bray-curtis distance 
+
 |          | Df| SumsOfSqs|   MeanSqs|  F.Model|        R2| Pr(>F)|
 |:---------|--:|---------:|---------:|--------:|---------:|------:|
 |treatment |  2| 3.5261637| 1.7630819| 74.06469| 0.9367606|  0.001|

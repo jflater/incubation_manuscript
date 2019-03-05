@@ -88,6 +88,9 @@ Nutrients contained in inputs:
 
 ![](./Figures/rela_abund_input.png)
 
+Were the treatments significantly different? Adonis on the bray-curtis
+distance
+
 <table>
 <thead>
 <tr class="header">
