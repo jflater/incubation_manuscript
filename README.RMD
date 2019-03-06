@@ -36,6 +36,8 @@ Same as above, but now I used NMDS instead of PCoA for the ordination
 There is an OTU in the compost day 14 samples that has super high abundance, likely needs removed. 
 ![](./Figures/shannon.diversity.png)
 
+* Diversity is lowest in alfalfa day 7, this may suggest a more specialized bacterial community on day 7 than the other treatments or that the nutrient level is less selective than the more recalcitrant forms in the other treatments.  
+
 ## Relative Abundance of phyla in the inputs and the nutrient profiles of the inputs    
 Nutrients contained in inputs:
 
@@ -58,10 +60,12 @@ Were the treatments significantly different? Adonis on the bray-curtis distance
 
 ## Relative Abundance of phyla
 ![](./Figures/rela_abund.png)
-
+# Chemical Response     
 ## Inorganic nitrogen 
 ![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
+
+I don't think ANOVA is the correct approach here for determing p-values, this is a question that I need as a stats person.
 
 Anova results on the linear mixed effect model defined by: Inorganic_N~treatment * day, random=~1|replication
 
@@ -71,3 +75,7 @@ Anova results on the linear mixed effect model defined by: Inorganic_N~treatment
 |treatment     |     3|   253| 10708.1487|  <.0001|
 |day           |     5|   253|  2539.9503|  <.0001|
 |treatment:day |    15|   253|   488.1453|  <.0001|
+
+## Microbial Biomass
+![](./Figures/MBC_mg.kg_per_dry_wt_soil.png)
+![](./Figures/MBC_mg.kg_per_dry_wt_soil_plot_diff.png)

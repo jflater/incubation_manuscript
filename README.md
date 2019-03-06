@@ -38,6 +38,11 @@ Shannon Diversity of incubated microcosms.
 There is an OTU in the compost day 14 samples that has super high
 abundance, likely needs removed. ![](./Figures/shannon.diversity.png)
 
+-   Diversity is lowest in alfalfa day 7, this may suggest a more
+    specialized bacterial community on day 7 than the other treatments
+    or that the nutrient level is less selective than the more
+    recalcitrant forms in the other treatments.
+
 Relative Abundance of phyla in the inputs and the nutrient profiles of the inputs
 ---------------------------------------------------------------------------------
 
@@ -137,13 +142,12 @@ distance
 Relative Abundance of phyla
 ---------------------------
 
-![](./Figures/rela_abund.png)
-
-Inorganic nitrogen
-------------------
-
-![](./Figures/inorganic_N_plot.png)
+![](./Figures/rela_abund.png) \# Chemical Response  
+\#\# Inorganic nitrogen ![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
+
+I don't think ANOVA is the correct approach here for determing p-values,
+this is a question that I need as a stats person.
 
 Anova results on the linear mixed effect model defined by:
 Inorganic\_N~treatment \* day, random=~1|replication
@@ -189,3 +193,9 @@ Inorganic\_N~treatment \* day, random=~1|replication
 </tr>
 </tbody>
 </table>
+
+Microbial Biomass
+-----------------
+
+![](./Figures/MBC_mg.kg_per_dry_wt_soil.png)
+![](./Figures/MBC_mg.kg_per_dry_wt_soil_plot_diff.png)
