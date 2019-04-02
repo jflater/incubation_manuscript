@@ -3,6 +3,7 @@ Libraries needed
 library(phyloseq)
 library(tidyverse)
 library(gplots)
+library(phylosmith)
 ```
 
 Read in whole phyloseq object
@@ -13,6 +14,15 @@ incubation.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
 See what categories describe our treatments:
 ```{r}
 levels(sample_data(incubation.physeq)$treatment)
+```
+Heatmap will look nicer if we merge by treatment and day later, so here we add a new column to merge on later
+```{r}
+data <- data.frame(sample_data(incubation.physeq)) %>%
+  mutate(TreatmentAndDay = paste(treatment, day))
+rownames(data) <- data$i_id
+sample_data(incubation.physeq) <- data
+sample_data(incubation.physeq)$day <- as.factor(sample_data(incubation.physeq)$day)
+sample_data(incubation.physeq)
 ```
 
 Function to get a list of OTUs from a sample type
@@ -49,28 +59,40 @@ GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus, sa
   print("Detecting aliens in amended soil")
   aliens.venn <- venn(aliens)
   aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
-  incubated <- prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
-    filter_taxa(function(x) sum(x) > 5, T) %>%
+  rare.merged <- merge_samples(physeq, "TreatmentAndDay")
+  sample_data(rare.merged)$TreatmentAndDay <-  levels(sample_data(physeq)$TreatmentAndDay)  
+  incubated <- prune_samples(sample_data(rare.merged)$treatment %in% c(samples), rare.merged) %>%
+    filter_taxa(function(x) sum(x) > 0, T) %>%
     transform_sample_counts(function(x) x / sum(x)) 
-  incubated.aliens <- prune_taxa(aliens.detected, incubated)
-  sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%
+  incubated.aliens <- prune_taxa(aliens.detected, incubated) %>%
+    tax_glom(taxrank = "Genus") 
+  test <- incubated.aliens
+  sample.order <- as.data.frame(sample_data(test)) %>%
     arrange(day, replication) %>%
     select(i_id) %>%
     remove_rownames()   
-  alien.heatmap <- plot_heatmap(incubated.aliens, sample.label = "day", taxa.order= "Phylum", taxa.label = "Genus",
-                                  sample.order = as.character(sample.order$i_id), 
-                                  low = "#66CCFF", high = "#000033", na.value = "white")
+  alien.heatmap <- plot_heatmap(test, sample.order = "day", taxa.order= "Phylum", taxa.label = "Genus",
+                                  low = "yellow", high = "red", na.value = "gray") +
+    theme_bw() + 
+    theme(axis.text.x = element_text(angle = -45, hjust = 0)) +
+    geom_tile(color = "white", size = 0.25)
   alien.heatmap
 }
 ```
 
 ```{r, warning=FALSE}
-alf.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c("Alfalfa"))
+alf.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, AlfalfaAmend.otus, Alfalfa.otus, c(1))
 alf.heatmap
 saveRDS(alf.heatmap$data$OTU, "../data/alf.aliens.rds")
 ```
+```{bash}
+
+blastp -query my1000seqs.fasta -db nr -remote
+```
+
+
 ```{r, warning=FALSE}
-comp.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c("Compost"))
+comp.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, CompostAmend.otus, Compost.otus, c(5))
 comp.heatmap
 saveRDS(comp.heatmap$data$OTU, "../data/comp.aliens.rds")
 ```
@@ -79,7 +101,7 @@ I didn't extract DNA from a mixed sample of compost and alfalfa, to get the list
 
 ```{r, warning=FALSE}
 mix <- c(AlfalfaAmend.otus, CompostAmend.otus)
-mix.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, mix, CompAlfa.otus, c("CompAlfa"))
+mix.heatmap <- GetAlienHeatMap(incubation.physeq, Control.otus, mix, CompAlfa.otus, c(4))
 mix.heatmap
 saveRDS(mix.heatmap$data$OTU, "../data/mix.aliens.rds")
 ```

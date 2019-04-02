@@ -110,3 +110,4 @@ rare6k.physeq.data$response.group[rare6k.physeq.data$day %in% c("7", "14", "21")
 rare6k.physeq.data$response.group[rare6k.physeq.data$day %in% c("35", "49", "97")] <- "late" 
 sample_data(rare6k.physeq) <- rare6k.physeq.data
 saveRDS(rare6k.physeq, "data/IncPhyseqRareClusteredTree")
+

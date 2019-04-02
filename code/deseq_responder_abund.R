@@ -1,10 +1,9 @@
 library(phyloseq)
 library(vegan)
 library(tidyverse)
-library(DESeq2)
 library(gplots)
-
-inc.raw.physeq <- readRDS("Data/incubation_physeq_Aug18.RDS")
+library(DESeq2)
+inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
 inc.physeq <- subset_samples(inc.raw.physeq, day %in% c("0",
                                                         "7",
@@ -146,27 +145,28 @@ early.alf.otus <- log.plot.early.alf$data %>%
   filter(log2FoldChange >= 2) %>%
   arrange(desc(log2FoldChange))
 early.alf.otus 
-
+saveRDS(early.alf.otus, "data/early.alf.otus.rds")
 ###
 early.comp.otus <- log.plot.early.comp$data %>%
   rownames_to_column() %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 early.comp.otus
-
+saveRDS(early.comp.otus, "data/early.comp.otus.rds")
 ###
 early.mix.otus <- log.plot.early.mix$data %>%
   rownames_to_column() %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 early.mix.otus
-
+saveRDS(early.mix.otus, "data/early.mix.otus.rds")
 ###
 early.ref.otus <- log.plot.early.ref$data %>%
   rownames_to_column() %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 early.ref.otus
+saveRDS(early.ref.otus, "data/early.ref.otus.rds")
 
 venn <- venn(list(Alfalfa = early.alf.otus$OTU, Reference = early.ref.otus$OTU,
                   Mix = early.mix.otus$OTU, Compost = early.comp.otus$OTU))
@@ -176,6 +176,7 @@ late.alf.otus <- log.plot.late.alf$data %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 late.alf.otus 
+saveRDS(late.alf.otus, "data/late.alf.otus.rds")
 
 ###
 late.comp.otus <- log.plot.late.comp$data %>%
@@ -183,6 +184,7 @@ late.comp.otus <- log.plot.late.comp$data %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 late.comp.otus
+saveRDS(late.comp.otus, "data/late.comp.otus.rds")
 
 ###
 late.mix.otus <- log.plot.late.mix$data %>%
@@ -190,6 +192,7 @@ late.mix.otus <- log.plot.late.mix$data %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 late.mix.otus
+saveRDS(late.mix.otus, "data/late.mix.otus.rds")
 
 ###
 late.ref.otus <- log.plot.late.ref$data %>%
@@ -197,6 +200,7 @@ late.ref.otus <- log.plot.late.ref$data %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 late.ref.otus
+saveRDS(late.ref.otus, "data/late.ref.otus.rds")
 
 venn2 <- venn(list(Alfalfa = late.alf.otus$OTU,
                    Reference = late.ref.otus$OTU,
@@ -228,6 +232,7 @@ PlotRelativeAbundance <- function(df) {
     guides(fill = guide_legend(reverse = TRUE, keywidth = 1, keyheight = 1)) + 
     ylab("Phylogenetic distribution of OTUs with abundance > 2%") 
 }
+
 
 early.alf <- subset_samples(rare6k.physeq, treatment %in% c("Alfalfa")) %>%
   subset_samples(day %in% c("0", "7", "14", "21")) 
