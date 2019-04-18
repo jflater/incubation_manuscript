@@ -3,34 +3,38 @@ library(vegan)
 library(tidyverse)
 library(gplots)
 library(DESeq2)
-inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+library(ggtree)
 
-inc.physeq <- subset_samples(inc.raw.physeq, day %in% c("0",
-                                                        "7",
-                                                        "14",
-                                                        "21",
-                                                        "35",
-                                                        "49",
-                                                        "97"))
+
+inc.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
+
+tree <- read.tree("../data/tree.nwk")
+
+inc.physeq <- merge_phyloseq(inc.physeq, tree)
 
 #Rename treatments to more informative titles
-data <- data.frame(sample_data(inc.physeq)) %>%
+data <- data.frame(sample_data(inc.physeq)) %>% 
   mutate(treatment = recode(treatment,
                             'Control' = 'Reference',
-                            'CompAlfa' = 'Mix')) %>%
+                            'CompAlfa' = 'Mix')) %>% 
   mutate(C_N = C_flash / N_flash, Inorganic_N = NH3 + NO3) %>%
   mutate(TreatmentAndDay = paste(treatment, day))
+
 rownames(data) <- data$i_id
 sample_data(inc.physeq) <- data
 sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
-sample_data(inc.physeq)
 
 inc.physeq.data <- data.frame(sample_data(inc.physeq))
-inc.physeq.data$response.group[inc.physeq.data$day == "0"] <- "baseline" 
-inc.physeq.data$response.group[inc.physeq.data$day %in% c("7", "14", "21")] <- "early" 
-inc.physeq.data$response.group[inc.physeq.data$day %in% c("35", "49", "97")] <- "late" 
-inc.physeq.data <- inc.physeq.data %>%
+inc.physeq.data$response.group[inc.physeq.data$day == "0"] <-
+  "baseline"
+inc.physeq.data$response.group[inc.physeq.data$day %in% c("7", "14", "21")] <-
+  "early"
+inc.physeq.data$response.group[inc.physeq.data$day %in% c("35", "49", "97")] <-
+  "late"
+
+inc.physeq.data <- inc.physeq.data %>% 
   mutate(Treatment_Response = paste(treatment, response.group, sep = '_'))
+
 rownames(inc.physeq.data) <- data$i_id
 sample_data(inc.physeq) <- inc.physeq.data
 
@@ -71,8 +75,9 @@ log_plot <- function(sigtab,t1){
 } 
 
 # Use inc.physeq, not rarefied as DESeq does this
-alf.physeq <- subset_samples(inc.physeq, treatment %in% c("Alfalfa")) %>%
-  filter_taxa(function(x) sum(x) >= 2, T)
+# Use treatment and response group columns to capture early alfalfa and baseline alfalfa and reference to compare
+alf.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Alfalfa_baseline", "Reference_baseline")) %>%
+  filter_taxa(function(x) sum(x) >= 1, T)
 
 log.plot.early.alf <- alf.physeq %>%
   phyloseq_to_deseq2( ~ response.group) %>%

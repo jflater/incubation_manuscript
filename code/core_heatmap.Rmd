@@ -1,89 +1,151 @@
 ---
-title: "Persistor OTUs in the incubation experiment"
-output: html_notebook
+title: "Native Persistor OTUs in the incubation experiment"
+output: html_document
 ---
-# Persistor   
-`Persistor: OTUs detected in day 7 soils that persist into early or early and late groups of each treatment group`    
+# Native Persistor   
+`Persistor: OTUs detected in day 7 soils that persist into early or early and late groups of each treatment group` 
+`Native: OTUs in Reference soil for a given time point`     
+---
 Create a list of OTUs that make up the core taxa from reference soils. Let's create a core list for day 0, 0-97(all days), early and late groups. We will end up with four lists of OTUs for each grouping.
-
-```{r}
+```{r, echo=F, warning=F, message=F}
 library(phyloseq)
 library(vegan)
 library(tidyverse)
 library(gplots)
 library(DESeq2)
+```
 
-inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+```{r, message=F, warning=F}
+inc.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
+
+tree <- read.tree("../data/tree.nwk")
+
+inc.physeq <- merge_phyloseq(inc.physeq, tree)
 
 #Rename treatments to more informative titles
-data <- data.frame(sample_data(inc.physeq)) %>%
+data <- data.frame(sample_data(inc.physeq)) %>% 
   mutate(treatment = recode(treatment,
                             'Control' = 'Reference',
-                            'CompAlfa' = 'Mix')) %>%
+                            'CompAlfa' = 'Mix')) %>% 
   mutate(C_N = C_flash / N_flash, Inorganic_N = NH3 + NO3) %>%
   mutate(TreatmentAndDay = paste(treatment, day))
+
 rownames(data) <- data$i_id
 sample_data(inc.physeq) <- data
 sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
-sample_data(inc.physeq)
 
 inc.physeq.data <- data.frame(sample_data(inc.physeq))
-inc.physeq.data$response.group[inc.physeq.data$day == "0"] <- "baseline" 
-inc.physeq.data$response.group[inc.physeq.data$day %in% c("7", "14", "21")] <- "early" 
-inc.physeq.data$response.group[inc.physeq.data$day %in% c("35", "49", "97")] <- "late" 
-inc.physeq.data <- inc.physeq.data %>%
+inc.physeq.data$response.group[inc.physeq.data$day == "0"] <-
+"baseline"
+inc.physeq.data$response.group[inc.physeq.data$day %in% c("7", "14", "21")] <-
+"early"
+inc.physeq.data$response.group[inc.physeq.data$day %in% c("35", "49", "97")] <-
+"late"
+
+inc.physeq.data <- inc.physeq.data %>% 
   mutate(Treatment_Response = paste(treatment, response.group, sep = '_'))
+
 rownames(inc.physeq.data) <- data$i_id
 sample_data(inc.physeq) <- inc.physeq.data
 ```
 
-```{r}
-unique(inc.physeq@sam_data$treatment)
-alf_7 <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & day %in% c("7")) %>%
+```{r, message=F}
+ref_7 <- subset_samples(inc.physeq, treatment %in% c("Reference") & day %in% c("7")) %>%
   filter_taxa(function(x) sum(x) > 0, T)
 
-otu.mean = apply(X = otu_table(alf_7), MARGIN = 1, mean)
-otu.freq = rowSums(otu_table(alf_7) != 0)
+otu.mean = apply(X = otu_table(ref_7), MARGIN = 1, mean)
+otu.freq = rowSums(otu_table(ref_7) != 0)
 
 t = data.frame(Frequency = otu.freq, 
                Mean = otu.mean,
-               Total_Abundance = taxa_sums(alf_7), 
-               tax_table(alf_7))
-t[1:10,]
+               Total_Abundance = taxa_sums(ref_7), 
+               tax_table(ref_7))
 ```
 How about looking at high frequency OTUs? How many OTUs were detected in 8 out of 12 alfalfa microcosms on day 7?     
-```{r}
-nrow(alf_7)
+```{r, message=F}
+nrow(ref_7)
 high.freq <- t %>% 
   rownames_to_column("OTU") %>%
   filter(Frequency >= 8) 
-head(high.freq)
+
 nrow(high.freq)
 ```
-Track relative abundance of these 795 high frequency day 7 alfalfa OTUs throughout the incubated alfalfa timeline.    
-```{r}
-alfalfa <- subset_samples(inc.physeq, treatment %in% c("Alfalfa"))
-head(sample_data(alfalfa))
-alfalfa.high.freq <- prune_taxa(high.freq$OTU, alfalfa) %>%
-  filter_taxa(function(x) sum(x) > 1, T)
-```
+Track relative abundance of these 795 high frequency day 7 Reference OTUs throughout the incubated alfalfa timeline.    
+```{r, message=F, warning=F}
+Alfalfa <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & response.group %in% c("early", "late"))
+# Prune incubated Alfalfa samples to core from reference day 7
+Alfalfa.high.freq <- prune_taxa(high.freq$OTU, Alfalfa) %>%
+  filter_taxa(function(x) sum(x) > 0, T) %>%
+  transform_sample_counts(function(x) x/sum(x))
 
-```{r}
+myTaxa <- names(sort(taxa_sums(Alfalfa.high.freq), decreasing = T)[1:20])
+
+Alfalfa.high.freq.20 <- prune_taxa(myTaxa, Alfalfa.high.freq) %>%
+  filter_taxa(function(x) sum(x) > 0, T)
+
+nrow(tax_table(Alfalfa.high.freq.20))
 # This will make a list of samples in the correct day order
-sample.order <- as.data.frame(sample_data(alfalfa.high.freq)) %>%
+sample.order <- as.data.frame(sample_data(Alfalfa.high.freq.20)) %>%
   arrange(day, replication) %>%
   select(i_id) %>%
   remove_rownames() 
 
-#abundance_heatmap_ggplot(alf.a, classification = 'Genus', treatment = c('treatment'), transformation = 'log')
-
-plot_heatmap(alfalfa.high.freq, sample.label = "day", taxa.order = "Phylum", taxa.label = "Genus",  
+plot_heatmap(Alfalfa.high.freq.20, sample.label = "day", taxa.order = "Phylum", taxa.label = "Genus",  
                               sample.order = as.character(sample.order$i_id), 
                               low = "yellow", high = "red", na.value = "grey") 
+
+plot_tree(Alfalfa.high.freq.20, label.tips = "Genus", ladderize = "left", justify = "left", size = "Abundance")
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r, message=F, warning=F}
+Compost <- subset_samples(inc.physeq, treatment %in% c("Compost") & response.group %in% c("early", "late"))
+# Prune incubated Compost samples to core from reference day 7
+Compost.high.freq <- prune_taxa(high.freq$OTU, Compost) %>%
+  filter_taxa(function(x) sum(x) > 0, T) %>%
+  transform_sample_counts(function(x) x/sum(x))
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+myTaxa <- names(sort(taxa_sums(Compost.high.freq), decreasing = T)[1:20])
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+Compost.high.freq.20 <- prune_taxa(myTaxa, Compost.high.freq) %>%
+  filter_taxa(function(x) sum(x) > 0, T)
+
+nrow(tax_table(Compost.high.freq.20))
+# This will make a list of samples in the correct day order
+sample.order <- as.data.frame(sample_data(Compost.high.freq.20)) %>%
+  arrange(day, replication) %>%
+  select(i_id) %>%
+  remove_rownames() 
+
+plot_heatmap(Compost.high.freq.20, sample.label = "day", taxa.order = "Phylum", taxa.label = "Genus",  
+                              sample.order = as.character(sample.order$i_id), 
+                              low = "yellow", high = "red", na.value = "grey") 
+
+plot_tree(Compost.high.freq.20, label.tips = "Genus", ladderize = "left", justify = "left", size = "Abundance")
+```
+
+```{r, message=F, warning=F}
+Mix <- subset_samples(inc.physeq, treatment %in% c("Mix") & response.group %in% c("early", "late"))
+# Prune incubated Mix samples to core from reference day 7
+Mix.high.freq <- prune_taxa(high.freq$OTU, Mix) %>%
+  filter_taxa(function(x) sum(x) > 0, T) %>%
+  transform_sample_counts(function(x) x/sum(x))
+
+myTaxa <- names(sort(taxa_sums(Mix.high.freq), decreasing = T)[1:20])
+
+Mix.high.freq.20 <- prune_taxa(myTaxa, Mix.high.freq) %>%
+  filter_taxa(function(x) sum(x) > 0, T)
+
+nrow(tax_table(Mix.high.freq.20))
+# This will make a list of samples in the correct day order
+sample.order <- as.data.frame(sample_data(Mix.high.freq.20)) %>%
+  arrange(day, replication) %>%
+  select(i_id) %>%
+  remove_rownames() 
+
+plot_heatmap(Mix.high.freq.20, sample.label = "day", taxa.order = "Phylum", taxa.label = "Genus",  
+                              sample.order = as.character(sample.order$i_id), 
+                              low = "yellow", high = "red", na.value = "grey") 
+
+plot_tree(Mix.high.freq.20, label.tips = "Genus", ladderize = "left", justify = "left", size = "Abundance")
+```
+
