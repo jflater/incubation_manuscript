@@ -65,7 +65,15 @@ plot_ordination(rare6k.physeq, NMDS, color = "day") + stat_ellipse(geom = "polyg
 ```
 
 ```{r}
+data(chiroptera, package="ape")
 
+groupInfo <- split(chiroptera$tip.label, gsub("_\\w+", "", chiroptera$tip.label))
+
+chiroptera <- groupOTU(chiroptera, groupInfo)
+
+ggtree(chiroptera, aes(color=group), layout='circular') + geom_tiplab(size=1, aes(angle=angle))
+
+ggtree(inc_phy, aes(color=treatment), layout='circular') + geom_tiplab(size=1, aes(angle=angle))
 ```
 
 
