@@ -56,12 +56,12 @@ rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
 
 Now let's plot an PCA ordination of the weighted unifrac distances, which uses the phylogenetic tree and considers the phylogenetic relationship between OTUs when calculating the distance matrix
 ```{r, cache=T, warning=F, message=F}
-PCoA <- ordinate(rare6k.physeq, "PCoA", "wunifrac")
-plot_ordination(rare6k.physeq, PCoA, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
+#PCoA <- ordinate(rare6k.physeq, "PCoA", "wunifrac")
+#plot_ordination(rare6k.physeq, PCoA, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
 ```
 ```{r, cache=T, warning=F, message=F}
-NMDS <- ordinate(rare6k.physeq, "NMDS", "wunifrac")
-plot_ordination(rare6k.physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
+#NMDS <- ordinate(rare6k.physeq, "NMDS", "wunifrac")
+#plot_ordination(rare6k.physeq, NMDS, color = "day") + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.2, aes(fill = day))
 ```
 
 ```{r}
@@ -73,7 +73,74 @@ chiroptera <- groupOTU(chiroptera, groupInfo)
 
 ggtree(chiroptera, aes(color=group), layout='circular') + geom_tiplab(size=1, aes(angle=angle))
 
-ggtree(inc_phy, aes(color=treatment), layout='circular') + geom_tiplab(size=1, aes(angle=angle))
+top100otus <- names(sort(taxa_sums(rare6k.physeq), TRUE)[1:25])
+
+rare_top_100 <- prune_taxa(top100otus, rare6k.physeq) %>%
+    filter_taxa(function(x) sum(x) >= 1, T) 
+
+ggtree(rare_top_100, aes(color=treatment), layout='circular', branch.length = 'none') + geom_tiplab(size=1, aes(angle=angle)) +
+  scale_x_reverse(limits=c(10, 0)) + coord_polar(theta='y')
+
+otu_table(rare_top_100)
 ```
+   
+#Circular phylogenetic tree with rings
+```{r}
+install.packages("circlize")
+library("circlize")
+library("ape")
+data(bird.orders)
+
+bird.orders
+
+bc <- as.hclust(bird.orders)
+
+
+labels = bc$labels
+ct = cutree(bc, 6)
+n = length(labels)
+dend = as.dendrogram(bc)
+```
+```{r}
+circos.par(cell.padding = c(0, 0, 0, 0))
+circos.initialize(factors = "a", xlim = c(0, n)) # only one sector
+circos.track(ylim = c(0, 1), bg.border = NA, track.height = 0.3, 
+    panel.fun = function(x, y) {
+        for(i in seq_len(n)) {
+            circos.text(i-0.5, 0, labels[i], adj = c(0, 0.5), 
+                facing = "clockwise", niceFacing = TRUE,
+                col = ct[labels[i]], cex = 0.5)
+        }
+})
+```
+```{r}
+genotype <- 
+p <- ggtree(rare_top_100, mrsd="2013-01-01") + geom_tiplab(size=2, align=TRUE, linesize=.5) + theme_tree2()
+pp <- (p + scale_y_continuous(expand=c(0, 0.3))) %>%
+    gheatmap(genotype, offset=8, width=0.6, colnames=FALSE) %>%
+        scale_x_ggtree()
+pp + theme(legend.position="right")
+```
+```{r}
+beast_file <- system.file("examples/MCC_FluA_H3.tree", package="ggtree")
+beast_tree <- read.beast(beast_file)
+
+genotype_file <- system.file("examples/Genotype.txt", package="ggtree")
+genotype <- read.table(genotype_file, sep="\t", stringsAsFactor=F)
+inc_type <- 
+colnames(genotype) <- sub("\\.$", "", colnames(genotype))
+p <- ggtree(beast_tree, mrsd="2013-01-01") + geom_treescale(x=2008, y=1, offset=2)
+
+p <- p + geom_tiplab(size=2)
+gheatmap(p, genotype, offset=5, width=0.5, font.size=3, colnames_angle=-45, hjust=0) +
+    scale_fill_manual(breaks=c("HuH3N2", "pdm", "trig"), values=c("steelblue", "firebrick", "darkgreen"))
+```
+
+```{r}
+t <- ggtree(hclust(phy_tree(rare_top_100))) + geom_treescale(x=2008, y=1, offset=2)
+t <- t + geom_tiplab(size=2)
+t
+```
+
 
 
