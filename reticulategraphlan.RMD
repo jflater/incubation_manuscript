@@ -1,0 +1,19 @@
+
+# Reticulate  
+Reticluate is an R package to integrate Python code and scripts with R, here we will use
+it to make circular phylogenetic trees using the Graphlan package.  
+
+# in terminal
+```{bash}
+cd
+pwd
+```  
+```{bash, eval = F}
+# If Mac, update pip and install with python 2.7 like below
+pip2.7 install Mercurial
+```
+```{bash, eval = F}
+# Install graphlan with conda
+hg clone https://hg@bitbucket.org/nsegata/graphlan
+```
+

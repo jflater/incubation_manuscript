@@ -22,17 +22,6 @@ inc_phy <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 # Add the tree file to the phyloseq object
 inc_phy <- merge_phyloseq(inc_phy, tree)
 inc_phy
-data("GlobalPatterns")
-```
-```{r}
-x <- parse_phyloseq(GlobalPatterns)
-print(x)
-heat_tree(x,
-          node_size = n_obs,
-          node_color = n_obs,
-          node_label = taxon_names,
-          tree_label = taxon_names)
-
 ```
 ```{r}
 nounclass <- subset_taxa(inc_phy, Phylum != "Bacteria_unclassified")
@@ -53,4 +42,3 @@ heat_tree(parsed_inc,
           tree_label = taxon_names)
 ```
 
- run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
