@@ -1,0 +1,89 @@
+---
+title: "Metacoder: differential_heat_tree"
+output:
+  html_document:
+    df_print: paged
+---
+# From    
+https://grunwaldlab.github.io/metacoder_documentation/example.html
+```{r, cache = T, warning = F, message =F, eval=F}
+source('http://bioconductor.org/biocLite.R')
+biocLite("phyloseq")
+
+# Installing packages  
+install.packages(c("vegan", "metacoder", "taxa", "ggplot2", "dplyr", "readr", "stringr", "agricolae", "ggtree", "ape"),
+                 repos = "http://cran.rstudio.com",
+                 dependencies = TRUE)
+```
+```{r, cache = T, warning = F, message =F}
+library(metacoder)
+library(readr)
+library(dplyr)
+library(ggtree)
+```
+
+```{r, cache = T, warning = F, message =F}
+tree <- read.tree("data/tree.nwk")
+tree
+
+inc_phy <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+
+# Add the tree file to the phyloseq object
+inc_phy <- merge_phyloseq(inc_phy, tree)
+levels(inc_phy@sam_data$treatment)
+levels(as.factor(inc_phy@sam_data$day))
+inc_phy <- subset_samples(inc_phy, treatment %in% c("Compost", "Alfalfa", "Control", "CompAlfa") & day %in% c("7", "14", "21", "35", "49", "97"))
+```
+
+```{r, cache = T, warning = F, message =F}
+nounclass <- subset_taxa(inc_phy, Phylum != "Bacteria_unclassified")
+
+topotus <- names(sort(taxa_sums(nounclass), TRUE)[1:1000])
+
+inc_top <- phyloseq::prune_taxa(topotus, inc_phy) %>%
+  phyloseq::filter_taxa(function(x) sum(x) >= 1, T) %>% 
+  tax_glom(taxrank = "Genus")
+  
+parsed_inc <- parse_phyloseq(inc_top)
+
+print(parsed_inc)
+
+heat_tree(parsed_inc,
+          node_size = n_obs,
+          node_color = n_obs,
+          node_label = taxon_names,
+          tree_label = taxon_names)
+```
+
+```{r}
+parsed_inc$data$tax_abund <- calc_taxon_abund(parsed_inc, "otu_table",
+                                              cols = parsed_inc$data$sample_data$i_id)
+
+parsed_inc$data$diff_table <- compare_groups(parsed_inc, "tax_abund",
+                                             cols = parsed_inc$data$sample_data$i_id, # What columns of sample data to use 
+                                             groups = parsed_inc$data$sample_data$treatment) # What category each sample is assigned to
+print(parsed_inc$data$diff_table)
+```
+```{r}
+set.seed(1)
+plot <- heat_tree_matrix(parsed_inc,
+                 dataset = "diff_table",
+                 node_size = n_obs, # n_obs is a function that calculates, in this case, the number of OTUs per taxon
+                 node_label = taxon_names,
+                 node_color = log2_median_ratio, # A column from `obj$data$diff_table`
+                 node_color_range = diverging_palette(), # The built-in palette for diverging data
+                 node_color_trans = "linear", # The default is scaled by circle area
+                 node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
+                 edge_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
+                 node_size_axis_label = "Number of OTUs",
+                 node_color_axis_label = "Log2 ratio median proportions",
+                 layout = "davidson-harel", # The primary layout algorithm
+                 initial_layout = "reingold-tilford", # The layout algorithm that initializes node locations
+                 output_file = "differential_heat_tree.pdf") # Saves the plot as a pdf file
+```   
+```{r, fig.width=15, fig.height=15}
+plot
+```
+
+
+A taxon colored brown is more abundant in the treatment in the column, a taxon colored green is more abundant in the row. The lower left represents an unlabeled tree. 
