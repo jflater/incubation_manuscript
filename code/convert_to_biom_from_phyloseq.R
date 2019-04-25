@@ -48,3 +48,6 @@ write.dataset.biom <- function(ps, filePATH, filePREFIX, writeFASTA=TRUE, rename
   return(ps)
 }
 biom <- write.dataset.biom(inc_phy, filePATH = "data/", writeFASTA = F, filePREFIX = F, rename = F, useREFSEQ = F)
+test <- make_biom(data = inc_phy@otu_table, sample_metadata = inc_phy@sam_data, observation_metadata = inc_phy@tax_table)
+biom_inc <- write_biom(x = test, biom_file = "data/inc_biom.biom")
+## Now use this file and the export to graphlan python script to get into graphlan format
