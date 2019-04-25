@@ -1,0 +1,23 @@
+---
+title: "Convert to biom format from phyloseq"
+output: html_notebook
+---
+```{bash}
+cd Documents/incubation_manuscript
+ls
+pwd
+cd code
+ls
+pwd
+wget https://raw.githubusercontent.com/itsmisterbrown/microfiltR/master/microfiltR_source_code.R
+```
+```{bash}
+ls 
+```
+
+
+
+```{r}
+
+```
+
