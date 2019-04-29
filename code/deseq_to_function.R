@@ -6,9 +6,9 @@ library(DESeq2)
 library(ggtree)
 
 
-inc.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
+inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
-tree <- read.tree("../data/tree.nwk")
+tree <- read.tree("data/tree.nwk")
 
 inc.physeq <- merge_phyloseq(inc.physeq, tree)
 
@@ -86,10 +86,13 @@ log.plot.early.alf <- alf.physeq %>%
   log_plot("Alfalfa OTUS in early group that are significantly changing compared to day 0")
 log.plot.early.alf
 
-log.plot.late.alf <- alf.physeq %>%
+alf.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_late", "Alfalfa_early", "Reference_early")) %>%
+  filter_taxa(function(x) sum(x) >= 1, T)
+
+log.plot.late.alf <- alf.late.physeq %>%
   phyloseq_to_deseq2( ~ response.group) %>%
   DESeq(test = "Wald", fitType = "local") %>%
-  who_diff_day("late", "early", alf.physeq) %>%
+  who_diff_day("late", "early", alf.late.physeq) %>%
   log_plot("Alfalfa OTUS in late group that are significantly changing compared to early group")
 log.plot.late.alf
 
