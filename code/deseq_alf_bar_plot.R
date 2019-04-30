@@ -69,14 +69,45 @@ p = p + geom_bar(color="black", stat="identity", position="dodge") +
   facet_grid(. ~ Phylum)
 print(p)
 
-test.both <- alf.melt %>%
-  filter(OTU %in% both)
+RelativeAbundanceDf <- function(physeq) {
+  physeq %>% tax_glom(taxrank = "Phylum") %>% transform_sample_counts(function(x) {
+    x/sum(x)
+  }) %>% psmelt() %>% filter(Abundance > 0.02) %>% arrange(Phylum)
+}
 
-test.early <- alf.melt %>%
-  filter(OTU %in% early)
+# Function to plot relative abundance
+PlotRelativeAbundance <- function(df) {
+  ggplot(df, aes(x = as.factor(treatment), y = Abundance, fill = Phylum)) +
+    geom_bar(stat = "identity") +
+    theme(axis.title.x = element_blank()) +
+    guides(fill = guide_legend(reverse = TRUE, keywidth = 1, keyheight = 1)) +
+    ylab("Phylogenetic distribution of OTUs with abundance > 2%")
+}
 
-test.late <- alf.melt %>%
-  filter(OTU %in% late)
+treatment_names <- c(
+  `1` = "Alfalfa",
+  `2` = "Mix",
+  `3` = "Compost",
+  `4` = "Reference"
+)
+day_names <- c(
+  `1` = "7",
+  `2` = "14",
+  `3` = "21",
+  `4` = "35",
+  `5` = "49",
+  `6` = "97"
+)
+
+rare.merged <- merge_samples(rare6k.physeq, "TreatmentAndDay")
+
+sample_data(rare.merged)$TreatmentAndDay <- levels(sample_data(rare6k.physeq)$TreatmentAndDay)
+
+relllll <- PlotRelativeAbundance(RelativeAbundanceDf(rare.merged)) +
+  facet_grid(~ day, labeller = labeller(day = as_labeller(day_names))) +
+  scale_x_discrete(labels = treatment_names) +
+  rotate_x_text(angle = 45)
+relllll
 
 
 
