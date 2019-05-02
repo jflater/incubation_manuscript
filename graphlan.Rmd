@@ -1,0 +1,21 @@
+```{r}
+library(tidyverse)
+# Make a small file from phyloseq to test with graphlan, let's grab top 10 OTUs
+phy <- readRDS("data/IncPhyseqRareClusteredTree") 
+  
+OTU10 = names(sort(taxa_sums(phy), TRUE)[1:10])
+phy10 <- prune_taxa(OTU10, phy) %>%
+  filter_taxa(function(x) sum(x) >= 1, TRUE)
+
+plot_tree(phy10, color = "day", label.tips = "Phylum", ladderize = "left", justify = "left" , size = "Abundance") +
+  facet_wrap(. ~ treatment)
+
+tree1 = phy_tree(phy10)
+ape::write.tree(tree1, "incphy10.nwk")
+```
+
+Look at the annotation file from the example from graphlan (HMP)
+```{r}
+
+```
+
