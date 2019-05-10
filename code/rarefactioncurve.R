@@ -44,7 +44,11 @@ detectCores(all.tests=TRUE)
 cl <- makeCluster(detectCores(all.tests=TRUE))
 registerDoParallel(cl)
 
+#####
+#Read in your physeq object, mine is inc.physeq
+inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 rarefaction_curve_data <- calculate_rarefaction_curves(inc.physeq, c('Observed', 'Shannon'), rep(c(1, 10, 100, 1000, 1:100 * 10000), each = 10))
+#####
 
 # Shut down cluster
 stopCluster(cl)

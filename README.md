@@ -203,10 +203,10 @@ Microbial Biomass
 ![](./Figures/MBC_mg.kg_per_dry_wt_soil_plot_diff.png)
 Clustering analysis of communities over time   
 Alfalfa
-![](./Figures/hclust_alfalfa.tif)
+![](./Figures/hclust_alfalfa.png)
 
-![](./Figures/hclust_compost.tif)
+![](./Figures/hclust_compost.png)
 
-![](./Figures/hclust_mix.tif)
+![](./Figures/hclust_mix.png)
 
-![](./Figures/hclust_reference.tif)
+![](./Figures/hclust_reference.png)

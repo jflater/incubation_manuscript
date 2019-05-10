@@ -31,13 +31,27 @@ sample_data(inc.physeq) <- data
 sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
 sample_data(inc.physeq)
 
+sdt = data.frame(as(sample_data(inc.physeq), "data.frame"),
+                 TotalReads = sample_sums(inc.physeq), keep.rownames = TRUE)
+
+pSeqDepth = ggplot(sdt, aes(MBC_mg.kg_per_dry_wt_soil, TotalReads)) + 
+  geom_point(size = 4, alpha = 0.75) 
+plot(pSeqDepth) + geom_hline(yintercept = 10000)
+
+ggplot(sdt, aes(y = log(TotalReads), x = log(MBC_mg.kg_per_dry_wt_soil), colour = treatment, shape = treatment)) +
+  geom_point() + geom_smooth(method = "lm", fill = NA)
+
+min(sample_sums(inc.physeq))
+
 # Normalization, depth cutoff based on rarefaction 
 rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
                                    rngseed = 15879966) %>%
-  filter_taxa(function(x) sum(x) >= 2, T) 
+  filter_taxa(function(x) sum(x) >= 1, T) 
+
+min(sample_sums(rare6k.physeq))
 
 compost.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Compost")) %>%
-  filter_taxa(function(x) sum(x) >= 2, T) 
+  filter_taxa(function(x) sum(x) >= 1, T) 
 # get day and i_id for these samples, we will use this list to order the days on the tree
 compost.rownames <- data.frame(sample_data(compost.physeq)) %>%
   select(day, i_id)
@@ -49,12 +63,12 @@ compost.physeq.dist <- vegdist(t(data.frame(otu_table(compost.physeq))), method 
 compost.clustering <- hclust(compost.physeq.dist, method = "ward.D2")
 compost.clustering$labels <- rownamesforcompost
 
-tiff("Figures/hclust_compost.tif",height=5,width=6,units='in',res=300)
+png("Figures/hclust_compost.png",height=5,width=6,units='in',res=300)
 plot(as.phylo(compost.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
 dev.off()
 
 alfalfa.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Alfalfa")) %>%
-  filter_taxa(function(x) sum(x) >= 2, T)
+  filter_taxa(function(x) sum(x) >= 1, T)
 # get day and i_id for these samples, we will use this list to order the days on the tree
 alfalfa.rownames <- data.frame(sample_data(alfalfa.physeq)) %>%
   select(day, i_id)
@@ -66,12 +80,12 @@ alfalfa.physeq.dist <- vegdist(t(data.frame(otu_table(alfalfa.physeq))), method 
 alfalfa.clustering <- hclust(alfalfa.physeq.dist, method = "ward.D2")
 alfalfa.clustering$labels <- rownamesforalfalfa
 
-tiff("Figures/hclust_alfalfa.tif",height=5,width=6,units='in',res=300)
+png("Figures/hclust_alfalfa.png",height=5,width=6,units='in',res=300)
 plot(as.phylo(alfalfa.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
 dev.off()
 
 reference.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Reference")) %>%
-  filter_taxa(function(x) sum(x) >= 2, T) 
+  filter_taxa(function(x) sum(x) >= 1, T) 
 # get day and i_id for these samples, we will use this list to order the days on the tree
 reference.rownames <- data.frame(sample_data(reference.physeq)) %>%
   select(day, i_id)
@@ -83,12 +97,12 @@ reference.physeq.dist <- vegdist(t(data.frame(otu_table(reference.physeq))), met
 reference.clustering <- hclust(reference.physeq.dist, method = "ward.D2")
 reference.clustering$labels <- rownamesforreference
 
-tiff("Figures/hclust_reference.tif",height=5,width=6,units='in',res=300)
+png("Figures/hclust_reference.png",height=5,width=6,units='in',res=300)
 plot(as.phylo(reference.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
 dev.off()
 
 mix.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Mix")) %>%
-  filter_taxa(function(x) sum(x) >= 2, T)
+  filter_taxa(function(x) sum(x) >= 1, T)
 # get day and i_id for these samples, we will use this list to order the days on the tree
 mix.rownames <- data.frame(sample_data(mix.physeq)) %>%
   select(day, i_id)
@@ -100,7 +114,7 @@ mix.physeq.dist <- vegdist(t(data.frame(otu_table(mix.physeq))), method = "bray"
 mix.clustering <- hclust(mix.physeq.dist, method = "ward.D2")
 mix.clustering$labels <- rownamesformix
 
-tiff("Figures/hclust_mix.tif",height=5,width=6,units='in',res=300)
+png("Figures/hclust_mix.png",height=5,width=6,units='in',res=300)
 plot(as.phylo(mix.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
 dev.off()
 
