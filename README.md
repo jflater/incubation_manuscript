@@ -213,4 +213,8 @@ Reference
 
 All treatments clustered together into two groups, early and late. Now we will examine how each treatment's response in each group compares to reference and previous treatment group
 
-![](./Figures/differential_heat_tree.pdf)
+
+
+Heat Tree of top 1k taxa
+
+![](./Figures/metacoder.png)

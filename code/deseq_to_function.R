@@ -85,6 +85,9 @@ log.plot.early.alf <- alf.physeq %>%
   who_diff_day("early", "baseline", alf.physeq) %>%
   log_plot("Alfalfa OTUS in early group that are significantly changing compared to day 0")
 log.plot.early.alf
+png("Figures/log.plot.early.alf",height=5,width=6,units='in',res=300)
+plot(plot)
+dev.off()
 
 alf.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_late", "Alfalfa_early", "Reference_early")) %>%
   filter_taxa(function(x) sum(x) >= 1, T)

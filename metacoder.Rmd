@@ -41,7 +41,7 @@ nounclass <- subset_taxa(inc_phy, Phylum != "Bacteria_unclassified")
 topotus <- names(sort(taxa_sums(nounclass), TRUE)[1:1000])
 
 inc_top <- phyloseq::prune_taxa(topotus, inc_phy) %>%
-  phyloseq::filter_taxa(function(x) sum(x) >= 1, T) %>% 
+  phyloseq::filter_taxa(function(x) sum(x) >= 3, T) %>% 
   tax_glom(taxrank = "Genus")
   
 parsed_inc <- parse_phyloseq(inc_top)
@@ -67,7 +67,7 @@ print(parsed_inc$data$diff_table)
 ```{r}
 set.seed(1)
 plot <- heat_tree_matrix(parsed_inc,
-                 dataset = "diff_table",
+                 data = "diff_table",
                  node_size = n_obs, # n_obs is a function that calculates, in this case, the number of OTUs per taxon
                  node_label = taxon_names,
                  node_color = log2_median_ratio, # A column from `obj$data$diff_table`
@@ -83,6 +83,9 @@ plot <- heat_tree_matrix(parsed_inc,
 ```   
 ```{r, fig.width=15, fig.height=15}
 plot
+png("Figures/metacoder.png",height=5,width=6,units='in',res=300)
+plot(plot)
+dev.off()
 ```
 
 
