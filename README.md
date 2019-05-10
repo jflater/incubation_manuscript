@@ -202,11 +202,15 @@ Microbial Biomass
 ![](./Figures/MBC_mg.kg_per_dry_wt_soil.png)
 ![](./Figures/MBC_mg.kg_per_dry_wt_soil_plot_diff.png)
 Clustering analysis of communities over time   
-Alfalfa
-![](./Figures/hclust_alfalfa.png)
+Alfalfa   
+![](./Figures/hclust_alfalfa.png)       
+Compost   
+![](./Figures/hclust_compost.png)      
+Mix    
+![](./Figures/hclust_mix.png)    
+Reference    
+![](./Figures/hclust_reference.png)    
 
-![](./Figures/hclust_compost.png)
+All treatments clustered together into two groups, early and late. Now we will examine how each treatment's response in each group compares to reference and previous treatment group
 
-![](./Figures/hclust_mix.png)
-
-![](./Figures/hclust_reference.png)
+![](./Figures/differential_heat_tree.pdf)
