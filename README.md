@@ -142,8 +142,10 @@ distance
 Relative Abundance of phyla
 ---------------------------
 
-![](./Figures/rela_abund.png) \# Chemical Response  
-\#\# Inorganic nitrogen ![](./Figures/inorganic_N_plot.png)
+![](./Figures/rela_abund.png) 
+# Chemical Response         
+## Inorganic nitrogen            
+![](./Figures/inorganic_N_plot.png)
 ![](./Figures/inorganic_N_plot_diff.png)
 
 I don't think ANOVA is the correct approach here for determing p-values,
@@ -199,3 +201,12 @@ Microbial Biomass
 
 ![](./Figures/MBC_mg.kg_per_dry_wt_soil.png)
 ![](./Figures/MBC_mg.kg_per_dry_wt_soil_plot_diff.png)
+Clustering analysis of communities over time   
+Alfalfa
+![](./Figures/hclust_alfalfa.tif)
+
+![](./Figures/hclust_compost.tif)
+
+![](./Figures/hclust_mix.tif)
+
+![](./Figures/hclust_reference.tif)

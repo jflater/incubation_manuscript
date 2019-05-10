@@ -8,6 +8,11 @@ output:
 
 Merge tree file with the phyloseq object
 ```{r, warning=FALSE, echo=T, error=F, message=F, cache=T}
+source("https://bioconductor.org/biocLite.R")
+## biocLite("BiocUpgrade") ## you may need this
+biocLite("ggtree")
+
+
 library(tidyverse)
 library(phyloseq)
 library(ggtree)
