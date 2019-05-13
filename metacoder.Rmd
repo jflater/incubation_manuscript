@@ -38,6 +38,8 @@ inc_phy <- subset_samples(inc_phy, treatment %in% c("Compost", "Alfalfa", "Contr
 ```{r, cache = T, warning = F, message =F}
 nounclass <- subset_taxa(inc_phy, Phylum != "Bacteria_unclassified")
 
+
+
 topotus <- names(sort(taxa_sums(nounclass), TRUE)[1:1000])
 
 inc_top <- phyloseq::prune_taxa(topotus, inc_phy) %>%

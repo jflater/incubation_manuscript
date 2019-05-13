@@ -36,7 +36,37 @@ calculate_rarefaction_curves <- function(psdata, measures, depths, parallel=FALS
 }
 
 # Loading required library and displaying core configuration
-library('doParallel')
+pkgTest <- function(x) {
+    if (!require(x,character.only = TRUE))
+    {
+     install.packages(x,dep=TRUE)
+       if(!require(x,character.only = TRUE)) stop("Package not found")
+    }
+  }
+
+pkgTest('doParallel')
+library(doParallel)
+
+
+#####
+#Read in your physeq object, mine is inc.physeq
+library(phyloseq)
+library(tidyverse)
+
+inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+
+inc.physeq <- subset_samples(inc.physeq, day %in% c("7",
+                                                 "14",
+                                                 "21",
+                                                 "35",
+                                                 "49",
+                                                 "97")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T)
+
+inc.physeq
+min(taxa_sums(inc.physeq))
+
+# Use multiple cores
 detectCores(all.tests=TRUE)
 # 48
 
@@ -44,10 +74,7 @@ detectCores(all.tests=TRUE)
 cl <- makeCluster(detectCores(all.tests=TRUE))
 registerDoParallel(cl)
 
-#####
-#Read in your physeq object, mine is inc.physeq
-inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
-rarefaction_curve_data <- calculate_rarefaction_curves(inc.physeq, c('Observed', 'Shannon'), rep(c(1, 10, 100, 1000, 1:100 * 10000), each = 10))
+rarefaction_curve_data <- calculate_rarefaction_curves(inc.physeq, c('Observed', 'Shannon'), rep(c(1, 10, 100, 1000, 1:100 * 1000), each = 10))
 #####
 
 # Shut down cluster
@@ -61,7 +88,7 @@ rarefaction_curve_data_summary <- ddply(rarefaction_curve_data, c('Depth', 'Samp
 rarefaction_curve_data_summary_verbose <- merge(rarefaction_curve_data_summary, data.frame(sample_data(inc.physeq)), by.x = 'Sample', by.y = 'row.names')
 library('ggplot2')
 
-ggplot(
+plot <- ggplot(
   data = rarefaction_curve_data_summary_verbose,
   mapping = aes(
     x = Depth,
@@ -76,4 +103,11 @@ ggplot(
 ) + facet_wrap(
   facets = ~ Measure,
   scales = 'free_y'
-)
+) + geom_vline(xintercept = 5000) +
+  geom_point(size = .1)
+plot$layers[[2]] <- NULL
+plot 
+
+png("Figures/rare_curve_days7_97_mintax_3.png",height=5,width=8,units='in',res=600)
+plot(plot)
+dev.off()
