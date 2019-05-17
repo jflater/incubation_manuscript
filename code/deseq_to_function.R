@@ -76,9 +76,9 @@ log_plot <- function(sigtab,t1){
 
 # Use inc.physeq, not rarefied as DESeq does this
 # Use treatment and response group columns to capture early alfalfa and baseline alfalfa and reference to compare
-alf.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Alfalfa_baseline", "Reference_baseline")) %>%
-  filter_taxa(function(x) sum(x) >= 1, T)
 
+alf.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Alfalfa_baseline", "Reference_baseline")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T)
 log.plot.early.alf <- alf.physeq %>%
   phyloseq_to_deseq2( ~ response.group) %>%
   DESeq(test = "Wald", fitType = "local") %>%
@@ -89,8 +89,10 @@ png("Figures/log.plot.early.alf",height=5,width=6,units='in',res=300)
 plot(plot)
 dev.off()
 
+
+
 alf.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_late", "Alfalfa_early", "Reference_early")) %>%
-  filter_taxa(function(x) sum(x) >= 1, T)
+  filter_taxa(function(x) sum(x) >= 3, T)
 
 log.plot.late.alf <- alf.late.physeq %>%
   phyloseq_to_deseq2( ~ response.group) %>%
