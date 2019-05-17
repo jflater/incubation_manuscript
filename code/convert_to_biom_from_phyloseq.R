@@ -51,3 +51,6 @@ biom <- write.dataset.biom(inc_phy, filePATH = "data/", writeFASTA = F, filePREF
 test <- make_biom(data = inc_phy@otu_table, sample_metadata = inc_phy@sam_data, observation_metadata = inc_phy@tax_table)
 biom_inc <- write_biom(x = test, biom_file = "data/inc_biom.biom")
 ## Now use this file and the export to graphlan python script to get into graphlan format
+
+OTU10 = names(sort(taxa_sums(), TRUE)[1:10])
+b10=prune_taxa(OTU10, b1)

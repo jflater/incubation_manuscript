@@ -19,9 +19,22 @@ open_tree(p2, 80) %>% rotate_tree(80)
 tree <- read.tree("data/tree.nwk")
 inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 inc <- merge_phyloseq(inc.physeq, tree)
+inc <- subset_samples(inc, day %in% c("7", "14", "21", "35", "49", "97"))
 
 # too big, need smaller tree, use a phyloseq object with tree added and then only use one phyla
-inc.tiny <- subset_samples()
+TopNOTUs = names(sort(taxa_sums(inc), TRUE)[1:100])
+inc10 = prune_taxa(TopNOTUs, inc) %>%
+  filter_taxa(function(x) sum(x) >= 3, T)
 
-pp <- ggtree(tree, layout='circular', color="#4DAF4A", size=2, branch.length='none', right=T) +
-  annotate('text', x=0, y=40, label='ggtree', family='mono', size=16)
+library(tidyverse)
+t1 <- phy_tree(inc10)
+data <- psmelt(inc10) 
+#### working here, need a data.frame with 10 rows for each OTU and then columns with more info
+
+pp <- ggtree(t1, layout='circular', color="#4DAF4A", size=2, branch.length='none', right=T) 
+pp
+
+ph <- gheatmap(pp, cast.data, colnames = T, width=0.2, hjust='left', colnames_angle=-10, font.size=1.5)  +
+   theme_tree() 
+ph
+
