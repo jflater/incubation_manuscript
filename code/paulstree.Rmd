@@ -9,6 +9,13 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ggtree")
+BiocManager::install("phyloseq")
+BiocManager::install("treeio")
+
 library(reshape2)
 library(tidyverse)
 library(phyloseq)
@@ -22,14 +29,14 @@ inc <- merge_phyloseq(inc.physeq, tree)
 inc <- subset_samples(inc, day %in% c("7", "14", "21", "35", "49", "97"))
 inc
 no.unclass <- subset_taxa(inc, !Phylum=="Bacteria_unclassified")
-no.unclass
+no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
 inc_rare <- rarefy_even_depth(physeq = no.unclass, sample.size = 5000, rngseed = 3242343, verbose = F)
 inc_rare
 ```
 
 ```{r, message=F, error=F, warning=F}
 # too big, need smaller tree, use a phyloseq object with tree added and then only use one phyla
-TopNOTUs = names(sort(taxa_sums(inc_rare), TRUE)[1:1500])
+TopNOTUs = names(sort(taxa_sums(inc_rare), TRUE)[1:500])
 inc10 <- prune_taxa(TopNOTUs, inc_rare) %>%
   filter_taxa(function(x) sum(x) >= 3, T) %>%
   transform_sample_counts(function(x) x / sum(x)) %>%
@@ -67,6 +74,12 @@ head(d2)
 p <- ggtree(t1) %<+% d2 +
     geom_tiplab(aes(label=newlab), size=2, align=TRUE, linesize=.5) + theme_tree()
 p
+
+#circular plot
+y <- ggtree(t1, layout = "circular") %<+% d2 %>%
+    gheatmap(cast.data, offset=.7, width=0.1, font.size = 3, colnames=T, colnames_angle=-45, hjust=0) %>%
+        scale_x_ggtree()
+y
 
 final_p <- p  %>%
     gheatmap(cast.data, offset=.7, width=0.1, font.size = 3, colnames=T, colnames_angle=-45, hjust=0) %>%
