@@ -31,27 +31,14 @@ sample_data(inc.physeq) <- data
 sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
 sample_data(inc.physeq)
 
-sdt = data.frame(as(sample_data(inc.physeq), "data.frame"),
-                 TotalReads = sample_sums(inc.physeq), keep.rownames = TRUE)
+no.unclass <- subset_taxa(inc.physeq, !Phylum=="Bacteria_unclassified")
+no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
+rare6k.physeq <- rarefy_even_depth(physeq = no.unclass, sample.size = 6000, rngseed = 3242343, verbose = F)
+rare6k.physeq
 
-pSeqDepth = ggplot(sdt, aes(MBC_mg.kg_per_dry_wt_soil, TotalReads)) + 
-  geom_point(size = 4, alpha = 0.75) 
-plot(pSeqDepth) + geom_hline(yintercept = 10000)
-
-ggplot(sdt, aes(y = log(TotalReads), x = log(MBC_mg.kg_per_dry_wt_soil), colour = treatment, shape = treatment)) +
-  geom_point() + geom_smooth(method = "lm", fill = NA)
-
-min(sample_sums(inc.physeq))
-
-# Normalization, depth cutoff based on rarefaction 
-rare6k.physeq <- rarefy_even_depth(inc.physeq, sample.size = 6000,
-                                   rngseed = 15879966) %>%
-  filter_taxa(function(x) sum(x) >= 1, T) 
-
-min(sample_sums(rare6k.physeq))
-
+####Compost####
 compost.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Compost")) %>%
-  filter_taxa(function(x) sum(x) >= 1, T) 
+  filter_taxa(function(x) sum(x) >= 3, T) 
 # get day and i_id for these samples, we will use this list to order the days on the tree
 compost.rownames <- data.frame(sample_data(compost.physeq)) %>%
   select(day, i_id)
@@ -63,12 +50,15 @@ compost.physeq.dist <- vegdist(t(data.frame(otu_table(compost.physeq))), method 
 compost.clustering <- hclust(compost.physeq.dist, method = "ward.D2")
 compost.clustering$labels <- rownamesforcompost
 
-png("Figures/hclust_compost.png",height=5,width=6,units='in',res=300)
-plot(as.phylo(compost.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
+treec <- as.phylo(compost.clustering)
+colors <- c("7"="blue", "14"="blue", "21"="blue", "35"="red", "49"="red", "97"="red")
+png("Figures/hclust_compost_test.png",height=5,width=6,units='in',res=300)
+plot(treec, type = "unrooted", use.edge.length = TRUE, col = "gray80", cex = .4, font = 1, tip.color=colors[substr(treec$tip.label, 1, 6)])
 dev.off()
 
+####Alfalfa####
 alfalfa.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Alfalfa")) %>%
-  filter_taxa(function(x) sum(x) >= 1, T)
+  filter_taxa(function(x) sum(x) >= 3, T)
 # get day and i_id for these samples, we will use this list to order the days on the tree
 alfalfa.rownames <- data.frame(sample_data(alfalfa.physeq)) %>%
   select(day, i_id)
@@ -80,12 +70,16 @@ alfalfa.physeq.dist <- vegdist(t(data.frame(otu_table(alfalfa.physeq))), method 
 alfalfa.clustering <- hclust(alfalfa.physeq.dist, method = "ward.D2")
 alfalfa.clustering$labels <- rownamesforalfalfa
 
+treea <- as.phylo(alfalfa.clustering)
+colors <- c("7"="blue", "14"="blue", "21"="blue", "35"="red", "49"="red", "97"="red")
+
 png("Figures/hclust_alfalfa.png",height=5,width=6,units='in',res=300)
-plot(as.phylo(alfalfa.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
+plot(treea, type = "unrooted", use.edge.length = TRUE, col = "gray80", cex = .4, font = 1, tip.color=colors[substr(treea$tip.label, 1, 6)])
 dev.off()
 
+####Reference####
 reference.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Reference")) %>%
-  filter_taxa(function(x) sum(x) >= 1, T) 
+  filter_taxa(function(x) sum(x) >= 3, T) 
 # get day and i_id for these samples, we will use this list to order the days on the tree
 reference.rownames <- data.frame(sample_data(reference.physeq)) %>%
   select(day, i_id)
@@ -97,12 +91,16 @@ reference.physeq.dist <- vegdist(t(data.frame(otu_table(reference.physeq))), met
 reference.clustering <- hclust(reference.physeq.dist, method = "ward.D2")
 reference.clustering$labels <- rownamesforreference
 
+treer <- as.phylo(reference.clustering)
+colors <- c("7"="blue", "14"="blue", "21"="blue", "35"="red", "49"="red", "97"="red")
+
 png("Figures/hclust_reference.png",height=5,width=6,units='in',res=300)
-plot(as.phylo(reference.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
+plot(treer, type = "unrooted", use.edge.length = TRUE, col = "gray80", cex = .4, font = 1, tip.color=colors[substr(treer$tip.label, 1, 6)])
 dev.off()
 
+####Mix####
 mix.physeq <- subset_samples(rare6k.physeq, treatment %in% c("Mix")) %>%
-  filter_taxa(function(x) sum(x) >= 1, T)
+  filter_taxa(function(x) sum(x) >= 3, T)
 # get day and i_id for these samples, we will use this list to order the days on the tree
 mix.rownames <- data.frame(sample_data(mix.physeq)) %>%
   select(day, i_id)
@@ -114,14 +112,12 @@ mix.physeq.dist <- vegdist(t(data.frame(otu_table(mix.physeq))), method = "bray"
 mix.clustering <- hclust(mix.physeq.dist, method = "ward.D2")
 mix.clustering$labels <- rownamesformix
 
+treem <- as.phylo(mix.clustering)
+colors <- c("7"="blue", "14"="blue", "21"="blue", "35"="red", "49"="red", "97"="red")
+
 png("Figures/hclust_mix.png",height=5,width=6,units='in',res=300)
-plot(as.phylo(mix.clustering), type = "unrooted", use.edge.length = TRUE, col = "gray80")
+plot(treem, type = "unrooted", use.edge.length = TRUE, col = "gray80", cex = .4, font = 1, tip.color=colors[substr(treem$tip.label, 1, 6)])
 dev.off()
 
-rare6k.physeq.data <- data.frame(sample_data(rare6k.physeq))
-rare6k.physeq.data$response.group[rare6k.physeq.data$day == "0"] <- "baseline" 
-rare6k.physeq.data$response.group[rare6k.physeq.data$day %in% c("7", "14", "21")] <- "early" 
-rare6k.physeq.data$response.group[rare6k.physeq.data$day %in% c("35", "49", "97")] <- "late" 
-sample_data(rare6k.physeq) <- rare6k.physeq.data
-saveRDS(rare6k.physeq, "data/IncPhyseqRareClusteredTree")
+
 

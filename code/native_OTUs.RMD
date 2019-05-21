@@ -7,7 +7,10 @@ library(gplots)
 
 Read in whole phyloseq object
 ```{r}
-incubation.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
+incubation.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS") 
+incubation.physeq <- incubation.physeq %>%
+    filter_taxa(function(x) sum(x) > 3, T) %>%
+    tax_glom(taxrank = "Genus")
 ```
 
 See what categories describe our treatments:
@@ -19,7 +22,8 @@ Function to get a list of OTUs from a sample type
 ```{r}
 GetOTUs <- function(physeq, samples) {
     prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
-    filter_taxa(function(x) sum(x) > 1, T) %>%
+    filter_taxa(function(x) sum(x) > 3, T) %>%
+    tax_glom(taxrank = "Genus") %>%
     tax_table() %>%
     row.names()
 }
@@ -50,7 +54,7 @@ GetAlienHeatMap <- function(physeq, control_otus, alien_otus, recieving_otus, sa
   aliens.venn <- venn(aliens)
   aliens.detected <- attr(aliens.venn,"intersections")$`A:B`
   incubated <- prune_samples(sample_data(physeq)$treatment %in% c(samples), physeq) %>%
-    filter_taxa(function(x) sum(x) > 5, T) %>%
+    filter_taxa(function(x) sum(x) > 3, T) %>%
     transform_sample_counts(function(x) x / sum(x)) 
   incubated.aliens <- prune_taxa(aliens.detected, incubated)
   sample.order <- as.data.frame(sample_data(incubated.aliens)) %>%

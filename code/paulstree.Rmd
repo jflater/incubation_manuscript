@@ -3,8 +3,8 @@ title: "test"
 author: "Jared Flater"
 date: "5/15/2019"
 output:
-  word_document: default
   html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -87,6 +87,59 @@ final_p <- p  %>%
 plot(final_p)
 png("../Figures/abundance_tree.png",height=15,width=10,units='in',res=600)
 plot(final_p)
+dev.off()
+```
+                         
+## Tree and heatmap of responding genera      
+#### Early responders, genera from the eraly group of days compared to baseline for each treatment, the baseline comparison uses treatment and reference baseline genera (early treatment compared to baseline treatment + baseline reference). These are genera that are responding to the treatment condition and time. from each treatment. 
+
+```{r}
+early_resp_alf <- readRDS("../data/early.alf.otus.rds") %>% dplyr::rename(Early_Alfalfa = log2FoldChange, label = OTU)
+early_resp_comp <- readRDS("../data/early.comp.otus.rds") %>% dplyr::rename(Early_Compost = log2FoldChange, label = OTU)
+early_resp_mix <- readRDS("../data/early.mix.otus.rds") %>% dplyr::rename(Early_Mix = log2FoldChange, label = OTU)
+
+late_resp_alf <- readRDS("../data/late.alf.otus.rds") %>% dplyr::rename(Late_Alfalfa = log2FoldChange, label = OTU)
+late_resp_comp <- readRDS("../data/late.comp.otus.rds") %>% dplyr::rename(Late_Compost = log2FoldChange, label = OTU)
+late_resp_mix <- readRDS("../data/late.mix.otus.rds") %>% dplyr::rename(Late_Mix = log2FoldChange, label = OTU)
+
+all_resp <- rbind(early_resp_alf[1:3], late_resp_alf[1:3], early_resp_comp[1:3], late_resp_comp[1:3], early_resp_mix[1:3], late_resp_mix[1:3])
+
+dist_all_resp <- distinct(all_resp)
+df <- merge(early_resp_alf, dist_all_resp, all = T) %>%
+  merge(late_resp_alf, all = T) %>%
+  merge(early_resp_comp, all = T) %>%
+  merge(late_resp_comp, all = T) %>%
+  merge(early_resp_mix, all = T) %>%
+  merge(late_resp_mix, all = T) 
+
+```
+```{r}
+inc_resp <- prune_taxa(c(df$label), inc_rare)
+inc_resp_tre <- phy_tree(inc_resp)
+```
+
+```{r}
+df2 = dplyr::mutate(df, newlab = paste(Phylum, Genus, sep='|'))
+head(df2)
+```
+
+```{r}
+resp_p <- ggtree(inc_resp_tre) %<+% df2 +
+    geom_tiplab(aes(label=newlab), size=3, align=TRUE, linesize=.5) + theme_tree()
+resp_p
+```
+```{r}
+df3 <- df %>%
+  column_to_rownames("label") %>%
+  select(-c(Phylum, Genus))
+```
+```{r, fig.height=15, fig.width=10}
+final_resp <- resp_p  %>%
+    gheatmap(df3, offset=1.2, width=0.5, font.size = 3, colnames=T, colnames_angle=-45, hjust=0, color = "black") +
+  ggtitle("Log fold change of genera for each treatment response group") 
+plot(final_resp)
+png("../Figures/resp_tree.png",height=20,width=10,units='in',res=600)
+plot(final_resp)
 dev.off()
 ```
 
