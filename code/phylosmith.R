@@ -1,5 +1,7 @@
 library(phylosmith)
 library(phyloseq)
+library(tidyverse)
+library(ape)
 
 inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
@@ -47,7 +49,8 @@ taxa_abundance_bars_ggplot(rare6k.physeq, classification = 'Phylum',
                            treatment = c('treatment'), 
                            transformation = 'mean')
 
-tsne_phyloseq_ggplot(rare6k.physeq, treatment = c('treatment'), perplexity = 3, circle = TRUE, labels = FALSE, colors = 'default')
+plot
+tsne_phyloseq_ggplot(rare6k.physeq, treatment = c('treatment'), perplexity = 3, circle = TRUE, labels = T, colors = 'default')
 
 nmds_phyloseq_ggplot(rare6k.physeq, c('treatment'), circle = TRUE, verbose = FALSE)
 nmds_phyloseq_ggplot(rare6k.physeq, c('day'), circle = TRUE, verbose = FALSE)
