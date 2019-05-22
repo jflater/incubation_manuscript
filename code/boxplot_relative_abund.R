@@ -27,7 +27,7 @@ ggplot(inc10phylum, aes(x = treatment, y = Abundance), color = treatment) +
   facet_grid(Phylum~day, scales = "free") +
   geom_boxplot(aes(color = treatment), position = "dodge") 
 
-boxplot <- ggboxplot(data = inc10phylum, x = "treatment", y = "Abundance", color = "treatment", legend = "none") +
+boxplot <- ggboxplot(data = inc10phylum, x = "treatment", y = "Abundance", color = "treatment", legend = "none", ggtheme = theme_bw()) +
   rotate_x_text(angle = 45) +
   stat_compare_means(label = "p.signif", method = "t.test", ref.group = "Reference") +
   facet_grid(Phylum ~ day, scales = "free")

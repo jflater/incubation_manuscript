@@ -54,7 +54,7 @@ d = vegdist(t(data.frame(otu_table(rare6k.physeq))),
 NMDS.phy <- metaMDS(t(data.frame(otu_table(tmp.ps))), distance = "bray", k = 3, autotransform = F, trymax = 100)
                    
 NMDS.treatment<- plot_ordination(tmp.ps, NMDS.phy, type = "samples", color = "day")
-
+theme_set(theme_bw())
 png("Figures/NMDS_incubation_axes12.png",height=4,width=9,units='in',res=600)
 NMDS.treatment + stat_ellipse(geom = "polygon", type = "norm",
                    alpha = 0.2, aes(fill = day)) + 
@@ -90,7 +90,7 @@ PCoA.phy <- ordinate(tmp.ps, method = "PCoA",
                     distance = d)
 PCoA.treatment <- plot_ordination(tmp.ps, PCoA.phy, type = "samples", color = "treatment")
 PCoA.treatment <- PCoA.treatment + stat_ellipse(geom = "polygon", type = "norm", alpha = 0.3, aes(fill = treatment))
-
+theme_set(theme_bw())
 png("Figures/PCoA.treatment.png",height=4,width=9,units='in',res=600)
 PCoA.treatment
 dev.off()
