@@ -135,10 +135,9 @@ df3 <- df %>%
 ```
 ```{r, fig.height=15, fig.width=10}
 final_resp <- resp_p  %>%
-    gheatmap(df3, offset=1.2, width=0.5, font.size = 3, colnames=T, colnames_angle=-45, hjust=0, color = "black") +
-  ggtitle("Log fold change of genera for each treatment response group") 
+    gheatmap(df3, offset=1.2, width=0.5, font.size = 3, colnames=T, colnames_angle=-45, hjust=0, color = "black") 
 plot(final_resp)
-png("../Figures/resp_tree.png",height=20,width=10,units='in',res=600)
+png("../Figures/resp_tree.png",height=16,width=13,units='in',res=600)
 plot(final_resp)
 dev.off()
 ```

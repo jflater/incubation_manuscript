@@ -1,9 +1,7 @@
 library(phyloseq)
-library(vegan)
 library(tidyverse)
-library(gplots)
 library(DESeq2)
-library(ggtree)
+
 
 
 inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
@@ -23,6 +21,7 @@ data <- data.frame(sample_data(inc.physeq)) %>%
 rownames(data) <- data$i_id
 sample_data(inc.physeq) <- data
 sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
+sample_data(inc.physeq)$treatment <- as.character(sample_data(inc.physeq)$treatment)
 
 inc.physeq.data <- data.frame(sample_data(inc.physeq))
 inc.physeq.data$response.group[inc.physeq.data$day == "0"] <-
@@ -37,6 +36,10 @@ inc.physeq.data <- inc.physeq.data %>%
 
 rownames(inc.physeq.data) <- data$i_id
 sample_data(inc.physeq) <- inc.physeq.data
+
+no.unclass <- subset_taxa(inc.physeq, !Phylum=="Bacteria_unclassified")
+no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
+inc.physeq <- no.unclass
 
 who_diff_day <- function(DDS, choice1, choice2, phy.object){
   res = results(DDS, contrast = c("response.group", choice1, choice2), cooksCutoff = FALSE)
@@ -74,29 +77,29 @@ log_plot <- function(sigtab,t1){
     ggtitle(t1)
 } 
 
-# Use inc.physeq, not rarefied as DESeq does this
-# Use treatment and response group columns to capture early alfalfa and baseline alfalfa and reference to compare
-
-alf.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Alfalfa_baseline", "Reference_baseline")) %>%
+#################
+alf.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Reference_early")) %>%
   filter_taxa(function(x) sum(x) >= 3, T)
+
 log.plot.early.alf <- alf.physeq %>%
-  phyloseq_to_deseq2( ~ response.group) %>%
+  phyloseq_to_deseq2( ~ treatment) %>%
   DESeq(test = "Wald", fitType = "local") %>%
-  who_diff_day("early", "baseline", alf.physeq) %>%
-  log_plot("Alfalfa OTUS in early group that are significantly changing compared to day 0")
+  who_diff_day("Alfalfa", "Reference", alf.physeq) %>%
+  log_plot("Alfalfa OTUS in early group that are significantly changing compared to reference early")
+
 log.plot.early.alf
-png("Figures/log.plot.early.alf",height=5,width=6,units='in',res=300)
+png("Figures/log.plot.earlyvref.alf",height=5,width=6,units='in',res=300)
 plot(plot)
 dev.off()
 
-alf.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_late", "Alfalfa_early", "Reference_early")) %>%
+alf.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_late", "Reference_late")) %>%
   filter_taxa(function(x) sum(x) >= 3, T)
 
 log.plot.late.alf <- alf.late.physeq %>%
-  phyloseq_to_deseq2( ~ response.group) %>%
+  phyloseq_to_deseq2( ~ treatment) %>%
   DESeq(test = "Wald", fitType = "local") %>%
-  who_diff_day("late", "early", alf.late.physeq) %>%
-  log_plot("Alfalfa OTUS in late group that are significantly changing compared to early group")
+  who_diff_day("Alfalfa", "Reference", alf.late.physeq) %>%
+  log_plot("Alfalfa OTUS in late group that are significantly changing compared to reference late group")
 log.plot.late.alf
 
 early.alf.otus <- log.plot.early.alf$data %>%
@@ -105,11 +108,105 @@ early.alf.otus <- log.plot.early.alf$data %>%
   filter(log2FoldChange >= 2) %>%
   arrange(desc(log2FoldChange))
 early.alf.otus 
-saveRDS(early.alf.otus, "data/early.alf.otus.rds")
+saveRDS(early.alf.otus, "data/early.alfvref.otus.rds")
 
 late.alf.otus <- log.plot.late.alf$data %>%
   rownames_to_column() %>%
   select(OTU, Phylum, Genus, log2FoldChange) %>%
   filter(log2FoldChange >= 2)
 late.alf.otus 
-saveRDS(late.alf.otus, "data/late.alf.otus.rds")
+saveRDS(late.alf.otus, "data/late.alfvref.otus.rds")
+############
+comp.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Compost_early", "Reference_early")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) %>%
+  tax_glom(taxrank = "Genus")
+
+log.plot.early.comp <- comp.physeq %>%
+  phyloseq_to_deseq2( ~ treatment) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Compost", "Reference", comp.physeq) %>%
+  log_plot("Compost OTUS in early group that are significantly changing compared to reference early")
+
+log.plot.early.comp
+
+png("Figures/log.plot.earlyvref.comp",height=5,width=6,units='in',res=300)
+plot(plot)
+dev.off()
+
+comp.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Compost_late", "Reference_late")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) %>%
+  tax_glom(taxrank = "Genus")
+
+log.plot.late.comp <- comp.late.physeq %>%
+  phyloseq_to_deseq2( ~ treatment) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Compost", "Reference", comp.late.physeq) %>%
+  log_plot("Compost OTUS in late group that are significantly changing compared to late reference group")
+
+log.plot.late.comp
+
+early.comp.otus <- log.plot.early.comp$data %>%
+  rownames_to_column() %>%
+  select(OTU, Phylum, Genus, log2FoldChange) %>%
+  filter(log2FoldChange >= 2) %>%
+  arrange(desc(log2FoldChange))
+
+early.comp.otus 
+
+saveRDS(early.comp.otus, "data/early.compvref.otus.rds")
+
+late.comp.otus <- log.plot.late.comp$data %>%
+  rownames_to_column() %>%
+  select(OTU, Phylum, Genus, log2FoldChange) %>%
+  filter(log2FoldChange >= 2)
+
+late.comp.otus 
+
+saveRDS(late.comp.otus, "data/late.compvref.otus.rds")
+################
+mix.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Mix_early", "Reference_early")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) %>%
+  tax_glom(taxrank = "Genus")
+
+log.plot.early.mix <- mix.physeq %>%
+  phyloseq_to_deseq2( ~ treatment) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Mix", "Reference", mix.physeq) %>%
+  log_plot("Mix OTUS in early group that are significantly changing compared to early reference")
+
+log.plot.early.mix
+
+png("Figures/log.plot.earlyvref.mix",height=5,width=6,units='in',res=300)
+plot(plot)
+dev.off()
+
+mix.late.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Mix_late", "Reference_late")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) %>%
+  tax_glom(taxrank = "Genus")
+
+log.plot.late.mix <- mix.late.physeq %>%
+  phyloseq_to_deseq2( ~ treatment) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Mix", "Reference", mix.late.physeq) %>%
+  log_plot("Mix OTUS in late group that are significantly changing compared to late reference")
+
+log.plot.late.mix
+
+early.mix.otus <- log.plot.early.mix$data %>%
+  rownames_to_column() %>%
+  select(OTU, Phylum, Genus, log2FoldChange) %>%
+  filter(log2FoldChange >= 2) %>%
+  arrange(desc(log2FoldChange))
+
+early.mix.otus 
+
+saveRDS(early.mix.otus, "data/early.mixvref.otus.rds")
+
+late.mix.otus <- log.plot.late.mix$data %>%
+  rownames_to_column() %>%
+  select(OTU, Phylum, Genus, log2FoldChange) %>%
+  filter(log2FoldChange >= 2)
+
+late.mix.otus 
+
+saveRDS(late.mix.otus, "data/late.mixvref.otus.rds")

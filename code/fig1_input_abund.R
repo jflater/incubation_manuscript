@@ -1,9 +1,7 @@
 library(phyloseq)
 library(vegan)
 library(tidyverse)
-library(xtable)
-library(gridExtra)
-
+library(viridis)
 # This script used to generate relative abundance bar plots for the incubation inputs
 # tps is variable name for the temporary physeq object
 # Read in the phyloseq object, raw object from mothur, see code file mothur_to_phyloseq.R
@@ -13,8 +11,10 @@ inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 inc.inputs <- subset_samples(inc.raw.physeq, treatment %in% c("AlfalfaAmend", 
                                                               "AlfalfaSoil",
                                                               "CompostAmend"))
+no.unclass <- subset_taxa(inc.inputs, !Phylum=="Bacteria_unclassified")
+no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
+tps = no.unclass
 
-tps = inc.inputs
 # remove unused data
 rm(inc.inputs)
 rm(inc.raw.physeq)
@@ -44,9 +44,9 @@ d <- td[c("2mm.dry.alfalfa.soil", "2mm.dry.compost7", "2mm.dry.alfalfa.plant3"),
 d
 row.names(d) <- c("Soil", "Compost", "Alfalfa")
 
-td.table <- kable(d)
+#td.table <- kable(d)
 # table of characteristics
-td.table
+#td.table
 
 #Let's check some of the of taxa counts from theses samples
 # Minimum sample size
@@ -75,10 +75,10 @@ theme(legend.title = element_blank())
 input.PCoA 
 
 # Stats for input.PCoA
-input.PCoA.stats <- adonis(physeq.dist ~ treatment, data = data.frame(sample_data(tps)))
-png("Figures/input_PCoA_stats.png",height=2,width=9,units='in',res=300)
-kable(input.PCoA.stats$aov.tab)
-dev.off()
+#input.PCoA.stats <- adonis(physeq.dist ~ treatment, data = data.frame(sample_data(tps)))
+#png("Figures/input_PCoA_stats.png",height=2,width=9,units='in',res=300)
+#kable(input.PCoA.stats$aov.tab)
+#dev.off()
 
 
 # Relative Abundance in inputs
@@ -86,7 +86,7 @@ dev.off()
 RelativeAbundanceDf <- function(physeq) {
   physeq %>% tax_glom(taxrank = "Phylum") %>% transform_sample_counts(function(x) {
     x/sum(x)
-  }) %>% psmelt() %>% filter(Abundance > 0.02) %>% arrange(Phylum)
+  }) %>% psmelt() %>% arrange(Phylum)
 }
 
 treatment_names <- c(
@@ -97,17 +97,19 @@ treatment_names <- c(
 # Function to plot relative abundance
 PlotRelativeAbundance <- function(df) {
   ggplot(df, aes(x = as.factor(treatment), y = Abundance, fill = Phylum)) + 
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", color = "black") +
   theme(axis.title.x = element_blank()) + 
   guides(fill = guide_legend(reverse = TRUE, keywidth = 1, keyheight = 1)) + 
-  ylab("Phylogenetic distribution of OTUs with abundance > 2%") 
+  ylab("Relative abundance of phyla") +
+  xlab("Incubation inputs")
 }
 
 tps.merged <- merge_samples(tps, "treatment")
 sample_data(tps.merged)$treatment <- levels(sample_data(tps)$treatment)
-
+ggtheme = theme_bw()
 plot <- PlotRelativeAbundance(RelativeAbundanceDf(tps.merged)) + 
-  scale_x_discrete(labels = treatment_names)
+  scale_x_discrete(labels = treatment_names) 
 png("Figures/rela_abund_input.png",height=4,width=6,units='in',res=300)
-plot
+plot + scale_fill_viridis(discrete = T, option = "viridis") + ggplot2::theme_bw()
 dev.off()
+plot + scale_fill_viridis(discrete = T, option = "viridis") + ggplot2::theme_bw()
