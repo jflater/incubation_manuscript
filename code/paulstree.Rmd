@@ -138,7 +138,7 @@ final_resp <- resp_p  %>%
     gheatmap(df3, offset=1.2, width=0.5, font.size = 3, colnames=T, colnames_angle=-45, hjust=0, color = "black") 
 plot(final_resp)
 png("../Figures/resp_tree.png",height=16,width=13,units='in',res=600)
-plot(final_resp)
+plot(final_resp) + scale_color_viridis(discrete = T, option = "viridis") + ggplot2::theme_bw()
 dev.off()
 ```
 

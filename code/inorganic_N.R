@@ -39,6 +39,14 @@ em <- emmeans(inc.model.data, c("day", "treatment"), data = data)
 
 sum_em <- summary(em)
 
+levels(data$treatment)
+
+class(data$treatment)
+
+data$treatment <- ordered(data$treatment, levels = c("Alfalfa", "Mix", "Compost", "Reference"))
+
+
+
 theme_set(theme_bw())
 p <- ggplot(data = data, aes(x = day, y = Inorganic_N     )) +
   geom_point(aes(colour = treatment), size = 4) +
@@ -58,10 +66,13 @@ p <- ggplot(data = data, aes(x = day, y = Inorganic_N     )) +
     plot.title = element_text(face = "bold"),
     strip.text.x=element_text(size=15)
   )
-png("Figures/inorganic_N_plot.png",height=5,width=5,units='in',res=300)
-p
+
+
+
+png("Figures/inorganic_N_plot.png",height=5,width=5,units='in',res=600)
+p + scale_color_viridis(discrete = T, option = "viridis")
 dev.off()
-p
+p + scale_color_viridis(discrete = T, option = "viridis") 
 
 
 em2 <- emmeans(inc.model.data, c("treatment", "day"), data = data)
