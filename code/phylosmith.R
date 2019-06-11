@@ -50,10 +50,12 @@ taxa_abundance_bars_ggplot(rare6k.physeq, classification = 'Phylum',
                            transformation = 'mean')
 
 png("Figures/tsne_treatment.png",height=8,width=10,units='in',res=600)
+
 tsne_phyloseq_ggplot(rare6k.physeq, treatment = c('treatment'), perplexity = 10, circle = TRUE, colors = 'default') +
   scale_fill_viridis(discrete = T, option = "viridis") + ggplot2::theme_bw() +
   guides(fill=guide_legend(title="Treatment"))
 dev.off()
+
 # It would be nice to be able to label points that fall outside the elipse with the sample ID for easier outlier analysis
 nmds_phyloseq_ggplot(rare6k.physeq, c('treatment'), circle = TRUE, verbose = FALSE)
 nmds_phyloseq_ggplot(rare6k.physeq, c('day'), circle = TRUE, verbose = FALSE)

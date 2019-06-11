@@ -1,58 +1,83 @@
-inc.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+library(tidyverse)
+library(phyloseq)
+library(DESeq2)
 
-#Rename treatments to more informative titles
-data <- data.frame(sample_data(inc.physeq)) %>% 
-  mutate(treatment = recode(treatment,
-                            'Control' = 'Reference',
-                            'CompAlfa' = 'Mix')) %>% 
-  mutate(C_N = C_flash / N_flash, Inorganic_N = NH3 + NO3) %>%
-  mutate(TreatmentAndDay = paste(treatment, day))
 
-rownames(data) <- data$i_id
-sample_data(inc.physeq) <- data
-sample_data(inc.physeq)$day <- as.factor(sample_data(inc.physeq)$day)
-sample_data(inc.physeq)$treatment <- as.character(sample_data(inc.physeq)$treatment)
+# Load phyloseq object as inc.physeq
+inc.physeq <- readRDS("data/RDS/not.rare.nounclass")
 
-inc.physeq.data <- data.frame(sample_data(inc.physeq))
-inc.physeq.data$response.group[inc.physeq.data$day == "0"] <-
-  "baseline"
-inc.physeq.data$response.group[inc.physeq.data$day %in% c("7", "14", "21")] <-
-  "early"
-inc.physeq.data$response.group[inc.physeq.data$day %in% c("35", "49", "97")] <-
-  "late"
+# physeq <- subset_samples(phyloseq.object, Treatment_Response %in% c("Alfalfa_early", "Reference_early")) x
 
-inc.physeq.data <- inc.physeq.data %>% 
-  mutate(Treatment_Response = paste(treatment, response.group, sep = '_'))
+# LFC calculation and visualization function
 
-rownames(inc.physeq.data) <- data$i_id
-sample_data(inc.physeq) <- inc.physeq.data
-
-no.unclass <- subset_taxa(inc.physeq, !Phylum=="Bacteria_unclassified")
-no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
-inc.physeq <- no.unclass
-
-alf.physeq <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Reference_early")) %>%
-  filter_taxa(function(x) sum(x) >= 3, T)
-
-diagdds = phyloseq_to_deseq2(alf.physeq, ~ treatment)
-diagdds = DESeq(diagdds, test="Wald", fitType="local")
-res = results(diagdds, cooksCutoff = FALSE)
-alpha = 0.01
-sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(alf.physeq)[rownames(sigtab), ], "matrix"))
-head(sigtab)
-
-theme_set(theme_bw())
-scale_fill_discrete <- function(palname = "Set1", ...) {
-  scale_fill_brewer(palette = palname, ...)
+plot_deseq <- function(phyloseq_object){
+  # Subset phyloseq object 
+  physeq <- phyloseq_object %>%
+    filter_taxa(function(x) sum(x) >= 3, T)
+  # Convert to desey and perfrom differential expression analysis
+  diagdds = phyloseq_to_deseq2(physeq, ~ treatment)
+  diagdds = DESeq(diagdds, test="Wald", fitType="local")
+  res = results(diagdds, cooksCutoff = FALSE)
+  alpha = 0.01
+  sigtab = res[which(res$padj < alpha), ]
+  sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(physeq)[rownames(sigtab), ], "matrix"))
+  head(sigtab)
+  ####
+  #theme_set(theme_bw())
+  #scale_fill_discrete <- function(palname = "Set1", ...) {
+  #  scale_fill_brewer(palette = palname, ...)
+  #}
+  # Phylum order
+  x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
+  x = sort(x, TRUE)
+  sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
+  # Genus order
+  x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+  x = sort(x, TRUE)
+  sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+  plot <- ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=2) + 
+    theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+  return(plot)
 }
-# Phylum order
-x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
-x = sort(x, TRUE)
-sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
-# Genus order
-x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
-x = sort(x, TRUE)
-sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
-ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=6) + 
-  theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+
+# What sample_data column? 
+colnames(sample_data(inc.physeq))
+# Which two groups to compare from that column? 
+unique(inc.physeq@sam_data$Treatment_Response)
+
+Alfalfa_early = c("Alfalfa_early", "Reference_early")
+Alfalfa_early <- subset_samples(inc.physeq, Treatment_Response %in% Alfalfa_early)
+Alfalfa_early <- plot_deseq(Alfalfa_early)
+Alfalfa_early
+Alfalfa_early_data <- Alfalfa_early$data %>%
+  rownames_to_column(var = "OTU") %>%
+  filter(log2FoldChange >= 0) 
+Alfalfa_early_data$trt <- c("Alfalfa_early")
+
+Alfalfa_late = c("Alfalfa_late", "Reference_late")
+Alfalfa_late <- subset_samples(inc.physeq, Treatment_Response %in% Alfalfa_late)
+Alfalfa_late <- plot_deseq(Alfalfa_late)
+Alfalfa_late
+Alfalfa_late_data <- Alfalfa_late$data %>%
+  rownames_to_column(var = "OTU") %>%
+  filter(log2FoldChange >= 0) 
+Alfalfa_late_data$trt <- c("Alfalfa_late")
+
+otustokeep <- intersect(Alfalfa_early_data$OTU, Alfalfa_late_data$OTU)
+test <- rbind.data.frame(Alfalfa_early_data, Alfalfa_late_data) %>%
+  filter(OTU %in% otustokeep)
+
+ggplot(test, aes(x=Genus, y=log2FoldChange, color=Phylum, shape = trt)) + geom_point(size=2) + 
+    coord_flip() 
+
+xx <- Alfalfa_early_data %>%
+  select(OTU, Phylum, Genus, log2FoldChange) %>%
+  filter(OTU %in% otustokeep) %>%
+  rename(Alfalfa_early_log2FoldChange = log2FoldChange) %>%
+  left_join(Alfalfa_late_data) %>%
+  rename(Alfalfa_late_log2FoldChange = log2FoldChange) %>%
+  select(OTU, Phylum, Genus, Alfalfa_early_log2FoldChange, Alfalfa_late_log2FoldChange)
+
+ggplot(xx, aes(x = Alfalfa_early_log2FoldChange, y = Alfalfa_late_log2FoldChange, color = Phylum, label = Genus)) + geom_point(size = 1) +
+  coord_flip() +
+  geom_text(check_overlap = T, hjust = 0, nudge_x = 0.05) 
