@@ -2,14 +2,10 @@ library(tidyverse)
 library(phyloseq)
 library(DESeq2)
 
-
 # Load phyloseq object as inc.physeq
 inc.physeq <- readRDS("data/RDS/not.rare.nounclass")
 
-# physeq <- subset_samples(phyloseq.object, Treatment_Response %in% c("Alfalfa_early", "Reference_early")) x
-
 # LFC calculation and visualization function
-
 plot_deseq <- function(phyloseq_object){
   # Subset phyloseq object 
   physeq <- phyloseq_object %>%
@@ -70,14 +66,12 @@ test <- rbind.data.frame(Alfalfa_early_data, Alfalfa_late_data) %>%
 ggplot(test, aes(x=Genus, y=log2FoldChange, color=Phylum, shape = trt)) + geom_point(size=2) + 
     coord_flip() 
 
-xx <- Alfalfa_early_data %>%
-  select(OTU, Phylum, Genus, log2FoldChange) %>%
+all_alf <- Alfalfa_early_data %>%
+  select(OTU, Phylum, Genus, Alfalfa_early_log2FoldChange = log2FoldChange) %>%
   filter(OTU %in% otustokeep) %>%
-  rename(Alfalfa_early_log2FoldChange = log2FoldChange) %>%
   left_join(Alfalfa_late_data) %>%
-  rename(Alfalfa_late_log2FoldChange = log2FoldChange) %>%
-  select(OTU, Phylum, Genus, Alfalfa_early_log2FoldChange, Alfalfa_late_log2FoldChange)
+  select(OTU, Phylum, Genus, Alfalfa_early_log2FoldChange, Alfalfa_late_log2FoldChange = log2FoldChange)
 
-ggplot(xx, aes(x = Alfalfa_early_log2FoldChange, y = Alfalfa_late_log2FoldChange, color = Phylum, label = Genus)) + geom_point(size = 1) +
+ggplot(all_alf, aes(x = Alfalfa_early_log2FoldChange, y = Alfalfa_late_log2FoldChange, color = Phylum, label = Genus)) + geom_point(size = 1) +
   coord_flip() +
   geom_text(check_overlap = T, hjust = 0, nudge_x = 0.05) 
