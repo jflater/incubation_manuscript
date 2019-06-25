@@ -1,0 +1,16 @@
+---
+title: "Untitled"
+author: "Jared"
+date: "6/19/2019"
+output: pdf_document
+---
+
+```{r}
+library(kableExtra)
+library(magrittr)
+df3
+kable(df3, "latex", longtable =T, booktabs =T, caption ="Longtable") %>%
+  add_header_above(c(" ","Group 1"=5,"Group 2"=6)) %>%
+  kable_styling(latex_options =c("repeat_header"))
+```
+

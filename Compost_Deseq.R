@@ -39,7 +39,7 @@ plot_deseq <- function(phyloseq_object){
 Compost_early = c("Compost_early", "Reference_early")
 Compost_early <- subset_samples(inc.physeq, Treatment_Response %in% Compost_early)
 Compost_early <- plot_deseq(Compost_early)
-#Compost_early
+Compost_early
 Compost_early_data <- Compost_early$data %>%
   rownames_to_column(var = "OTU") %>%
   filter(log2FoldChange >= 0) 
@@ -48,7 +48,7 @@ Compost_early_data$trt <- c("Compost_early")
 Compost_late = c("Compost_late", "Reference_late")
 Compost_late <- subset_samples(inc.physeq, Treatment_Response %in% Compost_late)
 Compost_late <- plot_deseq(Compost_late)
-#Compost_late
+Compost_late
 Compost_late_data <- Compost_late$data %>%
   rownames_to_column(var = "OTU") %>%
   filter(log2FoldChange >= 0) 

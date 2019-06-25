@@ -1,0 +1,353 @@
+---
+title: "Plotting of OTUs responding to amendment in the Incubation Project"
+output:
+  html_document:
+    df_print: paged
+    fig_width: 8.5
+    fig_height: 11
+    fig_caption: true
+    toc: true
+    number_sections: false
+---
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("."))
+```
+
+#### Loading needed libraries, check if you need to install packages
+```{r, echo = F, message = F, warning = F}
+# Load libraries
+library(tidyverse)
+library(phyloseq)
+library(DESeq2)
+library(naniar)
+library(ggrepel)
+library(viridis)
+library(knitr)
+library(kableExtra)
+```
+
+#### Read in phyloseq object and custom deseq functions
+```{r, message = F, warning = F}
+# Load phyloseq object as inc.physeq, not rarefied but unclassified OTUs removed if at phylum level
+inc.physeq <- readRDS("data/RDS/not.rare.nounclass")
+
+# LFC calculation function
+who_diff_day <- function(DDS, choice1, choice2, phy.object){
+  res = results(DDS, contrast = c("Treatment_Response", choice1, choice2), cooksCutoff = FALSE)
+  #plotCounts(AlfalfaDDS, gene="OTU_311", intgroup="day")
+  #Use above line to check if an OTU is increasing or decreasing depending on order of contrast
+  alpha = 0.01
+  #alpha = 0.1
+  sigtab = res[which(res$padj < alpha), ]
+  sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(phy.object)[rownames(sigtab), ], "matrix"))
+  theme_set(theme_bw())
+  scale_fill_discrete <- function(palname = "Set1", ...) {
+    scale_fill_brewer(palette = palname, ...)
+  }
+  # Phylum order
+  x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
+  x = sort(x, TRUE)
+  sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
+  # Genus order
+  x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+  x = sort(x, TRUE)
+  sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+  #ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=phylum)) + geom_point(size=2) + 
+  #  theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=1.0)) +
+  #  ggtitle("Day 0 to Day 7")
+  return(sigtab)
+}
+
+# function plot log2FoldChange 
+log_plot <- function(sigtab,t1){
+  sigtab <- sigtab %>%
+    rownames_to_column(var = "OTU") %>%
+    filter(log2FoldChange >= 2) 
+  
+  ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=2) + 
+    coord_flip() +
+    ggtitle(t1)
+} 
+```
+
+# Alfalfa Responders   
+
+## Early
+```{r, message = F, warning = F}
+## Early   
+alf.early <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_early", "Reference_early")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) 
+
+# Be very careful of the design formula in the who_diff_day() function
+# This function also selects only LFC >= 2 and alpha 0.01 for significant and increasing otus to be returned
+log.plot.early.alf <- alf.early %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Alfalfa_early", "Reference_early", alf.early) %>%
+  log_plot("Alfalfa OTUS in early group that are significantly changing compared to reference early")
+
+# Save a data frame of these results
+log.plot.early.alf.data <- log.plot.early.alf$data %>%
+  mutate(trt = c("Alfalfa_early"))
+
+# print plot with viridis color 
+log.plot.early.alf + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+```
+
+## Late    
+```{r, message = F, warning = F}
+## Late 
+alf.late <- subset_samples(inc.physeq, Treatment_Response %in% c("Alfalfa_late", "Reference_late")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T)
+
+# Make deseq and plot as above
+log.plot.late.alf <- alf.late %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Alfalfa_late", "Reference_late", alf.late) %>%
+  log_plot("Alfalfa OTUS in late group that are significantly changing compared to reference late")
+
+# Save a data frame of these results
+log.plot.late.alf.data <- log.plot.late.alf$data %>%
+  mutate(trt = c("Alfalfa_late"))
+
+# print plot with viridis color 
+log.plot.late.alf + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+```
+
+```{r, message = F, warning = F}
+# Common to both early and late with LFC >=2
+otustokeep <- intersect(log.plot.early.alf.data$OTU, log.plot.late.alf.data$OTU)
+
+# Trim and rename variables
+early_alf_OTUS <- log.plot.early.alf.data %>%
+  select(OTU, Phylum, Class, Order, Family, Genus, Alfalfa_early_log2FoldChange = log2FoldChange) 
+
+late_alf_OTUS <- log.plot.late.alf.data %>%
+  select(OTU, Phylum, Class, Order, Family, Genus, Alfalfa_late_log2FoldChange = log2FoldChange)
+
+# join early and late
+all_alf <- full_join(early_alf_OTUS, late_alf_OTUS)
+```
+
+## Plot Alfalfa OTUs with LFC >= 2 in both early and late  
+
+This plot is showing the common OTUs with LFC > 3 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 2 on either axis. Common OTUs with LFC < 3 are left unlabeled.   
+
+```{r, message = F, warning = F, out.width = "100%"}
+p <- ggplot(all_alf,
+       aes(x = Alfalfa_early_log2FoldChange, 
+           y = Alfalfa_late_log2FoldChange,
+           color = Phylum,
+           label = OTU)) +
+  geom_miss_point() +
+  geom_text_repel(aes(label=ifelse(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3,as.character(OTU),'')),hjust=0,vjust=0) 
+
+p + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+# Save this list of alfalfa LFC > 2 for more plots
+saveRDS(all_alf, file = "data/RDS/LFC_alf_OTUs_June19.RDS")
+```
+
+## Plot a table of the Alfalfa OTUs with taxonomy   
+
+These OTUs had response greater than 3 in both early and late alfalfa   
+
+```{r, message = F, warning = F}
+OTUs <- all_alf %>%
+  filter(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3)
+
+kable(OTUs) %>%
+  kable_styling(bootstrap_options = "striped") %>%
+  scroll_box(width = "100%", height = "400px")
+```
+
+# Compost Responders   
+
+## Early
+```{r, message = F, warning = F}
+## Early   
+comp.early <- subset_samples(inc.physeq, Treatment_Response %in% c("Compost_early", "Reference_early")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) 
+
+# Be very careful of the design formula in the who_diff_day() function
+# This function also selects only LFC >= 2 and alpha 0.01 for significant and increasing otus to be returned
+log.plot.early.comp <- comp.early %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Compost_early", "Reference_early", comp.early) %>%
+  log_plot("Compost OTUS in early group that are significantly changing compared to reference early")
+
+# Save a data frame of these results
+log.plot.early.comp.data <- log.plot.early.comp$data %>%
+  mutate(trt = c("Compost_early"))
+
+# print plot with viridis color 
+log.plot.early.comp + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+```
+
+## Late    
+```{r, message = F, warning = F}
+## Late 
+comp.late <- subset_samples(inc.physeq, Treatment_Response %in% c("Compost_late", "Reference_late")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T)
+
+# Make deseq and plot as above
+log.plot.late.comp <- comp.late %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Compost_late", "Reference_late", comp.late) %>%
+  log_plot("Compost OTUS in late group that are significantly changing compared to reference late")
+
+# Save a data frame of these results
+log.plot.late.comp.data <- log.plot.late.comp$data %>%
+  mutate(trt = c("Compost_late"))
+
+# print plot with viridis color 
+log.plot.late.comp + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+```
+
+```{r, message = F, warning = F}
+# Common to both early and late with LFC >=2
+otustokeep <- intersect(log.plot.early.comp.data$OTU, log.plot.late.comp.data$OTU)
+
+# Trim and rename variables
+early_comp_OTUS <- log.plot.early.comp.data %>%
+  select(OTU, Phylum, Class, Order, Family, Genus, Compost_early_log2FoldChange = log2FoldChange) 
+
+late_comp_OTUS <- log.plot.late.comp.data %>%
+  select(OTU, Phylum, Class, Order, Family, Genus, Compost_late_log2FoldChange = log2FoldChange)
+
+# join early and late
+all_comp <- full_join(early_comp_OTUS, late_comp_OTUS)
+```
+
+## Plot Compost OTUs with LFC >= 2 in both early and late  
+
+This plot is showing the common OTUs with LFC > 3 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 2 on either axis. Common OTUs with LFC < 3 are left unlabeled.   
+
+```{r, message = F, warning = F, out.width = "100%"}
+p <- ggplot(all_comp,
+       aes(x = Compost_early_log2FoldChange, 
+           y = Compost_late_log2FoldChange,
+           color = Phylum,
+           label = OTU)) +
+  geom_miss_point() +
+  geom_text_repel(aes(label=ifelse(Compost_early_log2FoldChange>3 & Compost_late_log2FoldChange>3,as.character(OTU),'')),hjust=0,vjust=0) 
+
+p + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+# Save this list of compcompa LFC > 2 for more plots
+saveRDS(all_comp, file = "data/RDS/LFC_comp_OTUs_June19.RDS")
+```
+
+## Plot a table of the Compost OTUs with taxonomy   
+
+These OTUs had response greater than 3 in both early and late compcompa   
+
+```{r, message = F, warning = F}
+OTUs <- all_comp %>%
+  filter(Compost_early_log2FoldChange>3 & Compost_late_log2FoldChange>3)
+
+kable(OTUs) %>%
+  kable_styling(bootstrap_options = "striped") %>%
+  scroll_box(width = "100%", height = "400px")
+```
+
+# Mix Responders   
+
+## Early
+```{r, message = F, warning = F}
+## Early   
+mix.early <- subset_samples(inc.physeq, Treatment_Response %in% c("Mix_early", "Reference_early")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) 
+
+# Be very careful of the design formula in the who_diff_day() function
+# This function also selects only LFC >= 2 and alpha 0.01 for significant and increasing otus to be returned
+log.plot.early.mix <- mix.early %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Mix_early", "Reference_early", mix.early) %>%
+  log_plot("Mix OTUS in early group that are significantly changing mixared to reference early")
+
+# Save a data frame of these results
+log.plot.early.mix.data <- log.plot.early.mix$data %>%
+  mutate(trt = c("Mix_early"))
+
+# print plot with viridis color 
+log.plot.early.mix + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+```
+
+## Late    
+```{r, message = F, warning = F}
+## Late 
+mix.late <- subset_samples(inc.physeq, Treatment_Response %in% c("Mix_late", "Reference_late")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T)
+
+# Make deseq and plot as above
+log.plot.late.mix <- mix.late %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") %>%
+  who_diff_day("Mix_late", "Reference_late", mix.late) %>%
+  log_plot("Mix OTUS in late group that are significantly changing mixared to reference late")
+
+# Save a data frame of these results
+log.plot.late.mix.data <- log.plot.late.mix$data %>%
+  mutate(trt = c("Mix_late"))
+
+# print plot with viridis color 
+log.plot.late.mix + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+```
+
+```{r, message = F, warning = F}
+# Common to both early and late with LFC >=2
+otustokeep <- intersect(log.plot.early.mix.data$OTU, log.plot.late.mix.data$OTU)
+
+# Trim and rename variables
+early_mix_OTUS <- log.plot.early.mix.data %>%
+  select(OTU, Phylum, Class, Order, Family, Genus, Mix_early_log2FoldChange = log2FoldChange) 
+
+late_mix_OTUS <- log.plot.late.mix.data %>%
+  select(OTU, Phylum, Class, Order, Family, Genus, Mix_late_log2FoldChange = log2FoldChange)
+
+# join early and late
+all_mix <- full_join(early_mix_OTUS, late_mix_OTUS)
+```
+
+## Plot Mix OTUs with LFC >= 2 in both early and late  
+
+This plot is showing the common OTUs with LFC > 3 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 2 on either axis. Common OTUs with LFC < 3 are left unlabeled.   
+
+```{r, message = F, warning = F, out.width = "100%"}
+p <- ggplot(all_mix,
+       aes(x = Mix_early_log2FoldChange, 
+           y = Mix_late_log2FoldChange,
+           color = Phylum,
+           label = OTU)) +
+  geom_miss_point() +
+  geom_text_repel(aes(label=ifelse(Mix_early_log2FoldChange>3 & Mix_late_log2FoldChange>3,as.character(OTU),'')),hjust=0,vjust=0) 
+
+p + scale_colour_viridis_d(option = "plasma") +
+  theme_dark()
+# Save this list of mixmixa LFC > 2 for more plots
+saveRDS(all_mix, file = "data/RDS/LFC_mix_OTUs_June19.RDS")
+```
+
+## Plot a table of the Mix OTUs with taxonomy   
+
+These OTUs had response greater than 3 in both early and late mixmixa   
+
+```{r, message = F, warning = F}
+OTUs <- all_mix %>%
+  filter(Mix_early_log2FoldChange>3 & Mix_late_log2FoldChange>3)
+
+kable(OTUs) %>%
+  kable_styling(bootstrap_options = "striped") %>%
+  scroll_box(width = "100%", height = "400px")
+```
