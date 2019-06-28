@@ -7,13 +7,14 @@ output:
     fig_height: 11
     fig_caption: true
     toc: true
+    toc_float: true
     number_sections: false
+    code_folding: hide
 ---
 ```{r setup}
 knitr::opts_knit$set(root.dir = normalizePath("."))
 ```
 
-#### Loading needed libraries, check if you need to install packages
 ```{r, echo = F, message = F, warning = F}
 # Load libraries
 library(tidyverse)
@@ -26,7 +27,6 @@ library(knitr)
 library(kableExtra)
 ```
 
-#### Read in phyloseq object and custom deseq functions
 ```{r, message = F, warning = F}
 # Load phyloseq object as inc.physeq, not rarefied but unclassified OTUs removed if at phylum level
 inc.physeq <- readRDS("data/RDS/not.rare.nounclass")
@@ -34,7 +34,7 @@ inc.physeq <- readRDS("data/RDS/not.rare.nounclass")
 # LFC calculation function
 who_diff_day <- function(DDS, choice1, choice2, phy.object){
   res = results(DDS, contrast = c("Treatment_Response", choice1, choice2), cooksCutoff = FALSE)
-  #plotCounts(AlfalfaDDS, gene="OTU_311", intgroup="day")
+  #plotCounts(DDS, gene="OTU_311", intgroup="day")
   #Use above line to check if an OTU is increasing or decreasing depending on order of contrast
   alpha = 0.01
   #alpha = 0.1
@@ -86,6 +86,13 @@ log.plot.early.alf <- alf.early %>%
   who_diff_day("Alfalfa_early", "Reference_early", alf.early) %>%
   log_plot("Alfalfa OTUS in early group that are significantly changing compared to reference early")
 
+#AlfalfaDDS <- alf.early %>%
+#  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+#  DESeq(test = "Wald", fitType = "local") 
+
+#plotCounts(AlfalfaDDS, gene = "Otu00002", intgroup = c("Treatment_Response"))
+#Use above line to check if an OTU is increasing or decreasing depending on order of contrast, replace with OTU of interest, run the phyloseq to desey in #other areas to check compost or mix. 
+
 # Save a data frame of these results
 log.plot.early.alf.data <- log.plot.early.alf$data %>%
   mutate(trt = c("Alfalfa_early"))
@@ -94,6 +101,8 @@ log.plot.early.alf.data <- log.plot.early.alf$data %>%
 log.plot.early.alf + scale_colour_viridis_d(option = "plasma") +
   theme_dark()
 ```
+
+
 
 ## Late    
 ```{r, message = F, warning = F}
@@ -162,6 +171,28 @@ OTUs <- all_alf %>%
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
+```
+
+### Two Otus in the top 10 of alfalfa responders were from the Genus Pseudomonas     
+BLASTn results for these two Otu00064 and Otu00494 were most similar to sequences from Pseudomonas fulva and Pseudomonas putida, both members of the Pseudomonas putida group
+
+### Plot counts of interesting Otu00064 and Otu00494 early    
+```{r, message = F, warning = F}
+early <- alf.early %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local") 
+late <- alf.late %>%
+  phyloseq_to_deseq2( ~ Treatment_Response) %>%
+  DESeq(test = "Wald", fitType = "local")
+plotCounts(early, gene = c("Otu00064"), intgroup = c("Treatment_Response"))
+plotCounts(early, gene = c("Otu00494"), intgroup = c("Treatment_Response"))
+#Use above line to check if an OTU is increasing or decreasing depending on order of contrast, replace with OTU of interest, run the phyloseq to desey in #other areas to check compost or mix. 
+```
+
+### Plot counts of interesting Otu00064 and Otu00494 late     
+```{r, message = F, warning = F}
+plotCounts(late, gene = "Otu00064", intgroup = c("Treatment_Response"))
+plotCounts(late, gene = "Otu00494", intgroup = c("Treatment_Response"))
 ```
 
 # Compost Responders   
@@ -247,7 +278,7 @@ saveRDS(all_comp, file = "data/RDS/LFC_comp_OTUs_June19.RDS")
 
 ## Plot a table of the Compost OTUs with taxonomy   
 
-These OTUs had response greater than 3 in both early and late compcompa   
+These OTUs had response greater than 3 in both early and late compost  
 
 ```{r, message = F, warning = F}
 OTUs <- all_comp %>%
@@ -341,7 +372,7 @@ saveRDS(all_mix, file = "data/RDS/LFC_mix_OTUs_June19.RDS")
 
 ## Plot a table of the Mix OTUs with taxonomy   
 
-These OTUs had response greater than 3 in both early and late mixmixa   
+These OTUs had response greater than 3 in both early and late mix   
 
 ```{r, message = F, warning = F}
 OTUs <- all_mix %>%

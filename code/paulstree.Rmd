@@ -9,8 +9,13 @@ output:
     fig_height: 11
     fig_caption: true
     toc: true
+    toc_float: true
     number_sections: false
+    code_folding: hide
 ---
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("."))
+```
 
 ```{r, echo = F, message = F, warning = F}
 knitr::opts_chunk$set(echo = TRUE)
@@ -42,7 +47,8 @@ inc_rare <- rarefy_even_depth(physeq = no.unclass, sample.size = 5000, rngseed =
  
 ```
  
-# This tree is showing comparisons between amendment and reference, the previous example showed differences between amendment and reference plus amendment from the previous time point. This should be a more accurate representation of OTUs responding to the amendment for each 
+## Tree     
+This tree is showing comparisons between amendment and reference, the previous example showed differences between amendment and reference plus amendment from the previous time point. This should be a more accurate representation of OTUs responding to the amendment for each 
 
 ```{r, message=F, error=F, warning=F, echo=F}
 # RDS saved from Alfalfa_Deseq, Mix_Deseq, Compost_Deseq
@@ -96,6 +102,9 @@ plot(final_resp) + scale_fill_viridis(option = "plasma") + ggplot2::theme_dark()
   guides(fill=guide_legend(title="Log fold change"))
 dev.off()
 ```
+
+## Table of Otus    
+All Otus with LFC greater than 3 in all treatment response groups
 ```{r, message=F, error=F, warning=F, echo=F}
 # Common responders in all amendments and response groups
 new_DF <- df3[rowSums(is.na(df3)) == 0,]
