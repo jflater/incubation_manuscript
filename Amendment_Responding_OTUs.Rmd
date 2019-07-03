@@ -152,12 +152,20 @@ p <- ggplot(all_alf,
            color = Phylum,
            label = OTU)) +
   geom_miss_point() +
-  geom_text_repel(aes(label=ifelse(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3,as.character(OTU),'')),hjust=0,vjust=0) 
+  geom_text_repel(aes(label=ifelse(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3,as.character(OTU),'')),hjust=1,vjust=1) +
+  theme(legend.position = "none")
 
 p + scale_colour_viridis_d(option = "plasma") +
   theme_dark()
 # Save this list of alfalfa LFC > 2 for more plots
 saveRDS(all_alf, file = "data/RDS/LFC_alf_OTUs_June19.RDS")
+
+png("Figures/early_late_alf_responders.png",height=5,width=8,units='in',res=300)
+p + scale_colour_viridis_d(option = "viridis") +
+  theme_bw() +
+  theme(legend.position = "none")
+dev.off()
+
 ```
 
 ## Plot a table of the Alfalfa OTUs with taxonomy   
@@ -167,7 +175,7 @@ These OTUs had response greater than 3 in both early and late alfalfa
 ```{r, message = F, warning = F}
 OTUs <- all_alf %>%
   filter(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3)
-
+write.table(OTUs, file = "Figures/alf_responders.txt", sep = ",", quote = F, row.names = F)
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
