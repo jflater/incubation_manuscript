@@ -3,9 +3,10 @@ library(vegan)
 library(tidyverse)
 library(ggplot2)
 library(ggpubr)
-inc.raw.physeq <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
 
-inc.physeq <- subset_samples(inc.raw.physeq, day %in% c("7",
+inc <- readRDS("data/RDS/incubation_physeq_Aug18.RDS")
+
+inc.physeq <- subset_samples(inc, day %in% c("7",
                                                         "14",
                                                         "21",
                                                         "35",
@@ -41,7 +42,7 @@ PlotRelativeAbundance <- function(df) {
     geom_bar(stat = "identity") +
     theme(axis.title.x = element_blank()) + 
     guides(fill = guide_legend(reverse = TRUE, keywidth = 1, keyheight = 1)) + 
-    ylab("Phylogenetic distribution of OTUs with abundance > 2%") 
+    ylab("Phylogenetic distribution\nof OTUs with abundance > 2%") 
 }
 
 treatment_names <- c(
@@ -67,9 +68,10 @@ relllll <- PlotRelativeAbundance(RelativeAbundanceDf(rare.merged)) +
   facet_grid(~ day, labeller = labeller(day = as_labeller(day_names))) +
   scale_x_discrete(labels = treatment_names) +
   rotate_x_text(angle = 45)
-relllll
+relllll 
 
-png("Figures/rela_abund.png",height=5,width=6,units='in',res=300)
-relllll
+png("Figures/rela_abund.png",height=3,width=4,units='in',res=600)
+relllll +
+  scale_fill_viridis_d(option = "viridis", aesthetics = "fill")
 dev.off()
 
