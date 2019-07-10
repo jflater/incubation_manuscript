@@ -43,7 +43,7 @@ inc <- subset_samples(inc, day %in% c("7", "14", "21", "35", "49", "97"))
 
 no.unclass <- subset_taxa(inc, !Phylum=="Bacteria_unclassified")
 no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
-inc_rare <- rarefy_even_depth(physeq = no.unclass, sample.size = 5000, rngseed = 3242343, verbose = F)
+inc_rare <- rarefy_even_depth(physeq = no.unclass, sample.size = 6000, rngseed = 3242343, verbose = F)
  
 ```
  
@@ -64,9 +64,11 @@ df <- resp_alf %>%
   full_join(resp_comp) %>%
   full_join(resp_mix)
 ```
+
 ```{r, message=F, error=F, warning=F, echo=F}
 inc_resp <- prune_taxa(c(df$label), inc_rare)
 ```
+
 ```{r, message=F, error=F, warning=F, echo=F}
 inc_resp <- phy_tree(inc_resp)
 inc_resp
@@ -77,7 +79,16 @@ head(df2)
 ```
 ```{r, message=F, error=F, warning=F, echo=F}
 resp_p <- ggtree(inc_resp) %<+% df2 +
-  geom_tiplab(aes(label=newlab), size=1, align=TRUE, linesize=.1) + theme_tree() 
+  geom_tiplab(aes(label=newlab), size=1, align=TRUE, linesize=.1) + 
+  geom_label2(aes(subset=!isTip, label=node), size=2, color="darkred", alpha=0.5) +
+  theme_tree() 
+testttt <- ggtree(inc_resp) +
+  geom_label2(aes(subset=!isTip, label=node), size=2, color="darkred", alpha=0.5) +
+  theme_tree()
+plot(testttt)
+t2 <- testttt %>% collapse(node = 443) %<+% df2 +
+  geom_tiplab(aes(label=newlab), size=1, align=TRUE, linesize=.1)
+plot(t2)
 ```
 ```{r, message=F, error=F, warning=F, echo=F}
 
@@ -101,6 +112,7 @@ png("../Figures/resp_tree.png", height = 20, width = 14, units = 'in', res = 600
 plot(final_resp) + scale_fill_viridis(option = "plasma") + ggplot2::theme_dark() +
   guides(fill=guide_legend(title="Log fold change"))
 dev.off()
+
 ```
 
 ## Table of Otus    
@@ -121,5 +133,17 @@ kable(new_DF) %>%
 #   geom_bar(stat = "identity") +
 #   facet_wrap("treatment") +
 #   theme(legend.position = "none")
+```
+```{r}
+tree <- ggtree(inc_resp)
+plot(tree)
+```
+```{r}
+p3 <- ggtree(inc_resp, aes(color=branch.length)) +
+  geom_tiplab(size=2, color="plum1") +
+  geom_label2(aes(subset=!isTip, label=node), size=2, color="darkred", alpha=0.5) +
+  scale_color_continuous(low='white', high='hotpink', name="Branch length (my)") +
+  theme(legend.position="bottom")
+plot(p3)
 ```
 
