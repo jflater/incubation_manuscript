@@ -30,7 +30,7 @@ library(kableExtra)
 ```{r, message = F, warning = F}
 # Load phyloseq object as inc.physeq, not rarefied but unclassified OTUs removed if at phylum level
 inc.physeq <- readRDS("data/RDS/not.rare.nounclass")
-
+source("code/functions.R")
 # LFC calculation function
 who_diff_day <- function(DDS, choice1, choice2, phy.object){
   res = results(DDS, contrast = c("Treatment_Response", choice1, choice2), cooksCutoff = FALSE)
@@ -390,3 +390,18 @@ kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
 ```
+
+## Plot relative abundance of OTUs with LFC > 3
+```{r}
+# We have lists of LFC OTUs, need to create a function that takes this and a target response group and returns the average relative abundance for these
+# input: list of OTUs, Treatment group
+resp_alf <- readRDS("data/RDS/LFC_alf_OTUs_June19.RDS") %>% dplyr::rename(label = OTU)
+OTUs <- as.character(resp_alf$label)
+alf.rela.early <- RelaOTUs(inc.physeq, c("Alfalfa_early"), OTUs) %>%
+  select(label = OTU, Alfalfa_early_meanRela = mean)
+alf.rela.late <- RelaOTUs(inc.physeq, c("Alfalfa_late"), OTUs) %>%
+  select(label = OTU, meanAlfalfa_late_meanRela = mean)
+all_alf_rela <- full_join(resp_alf, alf.rela.early) %>%
+  full_join(alf.rela.late)
+```
+
