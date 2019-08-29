@@ -37,8 +37,8 @@ inc.model.data <- lme(MBC_mg.kg_per_dry_wt_soil~treatment * day, random=~1|repli
 em <- emmeans(inc.model.data, c("day", "treatment"), data = data)
 plot(em)
 
-my.eff <- Effect(c("treatment", "day"), summary(inc.model.data))
-plot(my.eff)
+#my.eff <- Effect(c("treatment", "day"), summary(inc.model.data))
+#plot(my.eff)
 
 sum_em <- summary(em)
 plot(sum_em)

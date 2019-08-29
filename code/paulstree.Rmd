@@ -39,12 +39,15 @@ library(kableExtra)
 tree <- read.tree("../data/tree.nwk")
 inc.physeq <- readRDS("../data/RDS/incubation_physeq_Aug18.RDS")
 inc <- merge_phyloseq(inc.physeq, tree)
-inc <- subset_samples(inc, day %in% c("7", "14", "21", "35", "49", "97"))
+inc <- subset_samples(inc, day %in% c("7", "14", "21", "35", "49", "97")) %>%
+  filter_taxa(function(x) sum(x) >= 1, T) 
 
 no.unclass <- subset_taxa(inc, !Phylum=="Bacteria_unclassified")
-no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
+#no.unclass <- subset_taxa(no.unclass, !Genus=="Gp6_unclassified")
+
 inc_rare <- rarefy_even_depth(physeq = no.unclass, sample.size = 6000, rngseed = 3242343, verbose = F)
- 
+
+rm(tree, inc.physeq, inc, no.unclass)
 ```
  
 ## Tree     
@@ -86,12 +89,9 @@ testttt <- ggtree(inc_resp) +
   geom_label2(aes(subset=!isTip, label=node), size=2, color="darkred", alpha=0.5) +
   theme_tree()
 plot(testttt)
-t2 <- testttt %>% collapse(node = 443) %<+% df2 +
-  geom_tiplab(aes(label=newlab), size=1, align=TRUE, linesize=.1)
-plot(t2)
+
 ```
 ```{r, message=F, error=F, warning=F, echo=F}
-
 colnames(df2)
 head(df2$label)
 
@@ -104,7 +104,7 @@ write.csv(df3, file ="../data/resp_table.csv")
 ```{r, message=F, error=F, warning=F, echo=F}
 final_resp <- resp_p  %>% 
   gheatmap(df3, offset=0.25, width=0.1, font.size = 1, colnames=T, colnames_angle=-45, hjust=0, color = "black") +
-  ggtitle("Log fold change of genera for each treatment response group")
+  ggtitle("Log fold change of genera for each treatment response group. \nMin LFC = 4 when comparing to reference")
 plot(final_resp) + scale_fill_viridis(option = "plasma") + ggplot2::theme_dark() +
   guides(fill=guide_legend(title="Log fold change"))
 #plot(final_resp) + scale_color_viridis(discrete = T, option = "viridis") + ggplot2::theme_bw()
@@ -112,7 +112,6 @@ png("../Figures/resp_tree.png", height = 20, width = 14, units = 'in', res = 600
 plot(final_resp) + scale_fill_viridis(option = "plasma") + ggplot2::theme_dark() +
   guides(fill=guide_legend(title="Log fold change"))
 dev.off()
-
 ```
 
 ## Table of Otus    
@@ -123,21 +122,8 @@ new_DF <- df3[rowSums(is.na(df3)) == 0,]
 kable(new_DF) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
+```
 
-# Plot relative abundance by treatment across days for the 441 responding OTUs
-# phph <- subset_taxa(inc_rare, rownames(tax_table(inc_rare)) %in% dist_all_resp$label)
-# phph.r <- phph %>%
-#   transform_sample_counts(function(x) x / sum(x)) %>%
-#   psmelt()
-# ggplot(data = phph.r, mapping = aes(x = day, y = Abundance, color = OTU)) +
-#   geom_bar(stat = "identity") +
-#   facet_wrap("treatment") +
-#   theme(legend.position = "none")
-```
-```{r}
-tree <- ggtree(inc_resp)
-plot(tree)
-```
 ```{r}
 p3 <- ggtree(inc_resp, aes(color=branch.length)) +
   geom_tiplab(size=2, color="plum1") +

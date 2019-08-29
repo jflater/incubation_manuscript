@@ -62,7 +62,7 @@ who_diff_day <- function(DDS, choice1, choice2, phy.object){
 log_plot <- function(sigtab,t1){
   sigtab <- sigtab %>%
     rownames_to_column(var = "OTU") %>%
-    filter(log2FoldChange >= 2) 
+    filter(log2FoldChange >= 4) 
   
   ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=2) + 
     coord_flip() +
@@ -141,9 +141,9 @@ late_alf_OTUS <- log.plot.late.alf.data %>%
 all_alf <- full_join(early_alf_OTUS, late_alf_OTUS)
 ```
 
-## Plot Alfalfa OTUs with LFC >= 2 in both early and late  
+## Plot Alfalfa OTUs with LFC >= 4 in both early and late  
 
-This plot is showing the common OTUs with LFC > 3 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 2 on either axis. Common OTUs with LFC < 3 are left unlabeled.   
+This plot is showing the common OTUs with LFC > 4 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 4 on either axis. Common OTUs with LFC < 4 are left unlabeled.   
 
 ```{r, message = F, warning = F, out.width = "100%"}
 p <- ggplot(all_alf,
@@ -152,7 +152,7 @@ p <- ggplot(all_alf,
            color = Phylum,
            label = OTU)) +
   geom_miss_point() +
-  geom_text_repel(aes(label=ifelse(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3,as.character(OTU),'')),hjust=1,vjust=1) +
+  geom_text_repel(aes(label=ifelse(Alfalfa_early_log2FoldChange>4 & Alfalfa_late_log2FoldChange>4,as.character(OTU),'')),hjust=1,vjust=1) +
   theme(legend.position = "none")
 
 p + scale_colour_viridis_d(option = "plasma") +
@@ -174,7 +174,7 @@ These OTUs had response greater than 3 in both early and late alfalfa
 
 ```{r, message = F, warning = F}
 OTUs <- all_alf %>%
-  filter(Alfalfa_early_log2FoldChange>3 & Alfalfa_late_log2FoldChange>3)
+  filter(Alfalfa_early_log2FoldChange>4 & Alfalfa_late_log2FoldChange>4)
 write.table(OTUs, file = "Figures/alf_responders.txt", sep = ",", quote = F, row.names = F)
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
@@ -265,9 +265,9 @@ late_comp_OTUS <- log.plot.late.comp.data %>%
 all_comp <- full_join(early_comp_OTUS, late_comp_OTUS)
 ```
 
-## Plot Compost OTUs with LFC >= 2 in both early and late  
+## Plot Compost OTUs with LFC >= 4 in both early and late  
 
-This plot is showing the common OTUs with LFC > 3 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 2 on either axis. Common OTUs with LFC < 3 are left unlabeled.   
+This plot is showing the common OTUs with LFC > 4 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 4 on either axis. Common OTUs with LFC < 4 are left unlabeled.   
 
 ```{r, message = F, warning = F, out.width = "100%"}
 p <- ggplot(all_comp,
@@ -276,7 +276,7 @@ p <- ggplot(all_comp,
            color = Phylum,
            label = OTU)) +
   geom_miss_point() +
-  geom_text_repel(aes(label=ifelse(Compost_early_log2FoldChange>3 & Compost_late_log2FoldChange>3,as.character(OTU),'')),hjust=0,vjust=0) 
+  geom_text_repel(aes(label=ifelse(Compost_early_log2FoldChange>4 & Compost_late_log2FoldChange>4,as.character(OTU),'')),hjust=0,vjust=0) 
 
 p + scale_colour_viridis_d(option = "plasma") +
   theme_dark()
@@ -290,7 +290,7 @@ These OTUs had response greater than 3 in both early and late compost
 
 ```{r, message = F, warning = F}
 OTUs <- all_comp %>%
-  filter(Compost_early_log2FoldChange>3 & Compost_late_log2FoldChange>3)
+  filter(Compost_early_log2FoldChange>4 & Compost_late_log2FoldChange>4)
 
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
@@ -359,9 +359,9 @@ late_mix_OTUS <- log.plot.late.mix.data %>%
 all_mix <- full_join(early_mix_OTUS, late_mix_OTUS)
 ```
 
-## Plot Mix OTUs with LFC >= 2 in both early and late  
+## Plot Mix OTUs with LFC >= 4 in both early and late  
 
-This plot is showing the common OTUs with LFC > 3 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 2 on either axis. Common OTUs with LFC < 3 are left unlabeled.   
+This plot is showing the common OTUs with LFC > 4 while also showing the LFC of OTUs observed in only early or late, represented by the points landing below 4 on either axis. Common OTUs with LFC < 4 are left unlabeled.   
 
 ```{r, message = F, warning = F, out.width = "100%"}
 p <- ggplot(all_mix,
@@ -370,7 +370,7 @@ p <- ggplot(all_mix,
            color = Phylum,
            label = OTU)) +
   geom_miss_point() +
-  geom_text_repel(aes(label=ifelse(Mix_early_log2FoldChange>3 & Mix_late_log2FoldChange>3,as.character(OTU),'')),hjust=0,vjust=0) 
+  geom_text_repel(aes(label=ifelse(Mix_early_log2FoldChange>4 & Mix_late_log2FoldChange>4,as.character(OTU),'')),hjust=0,vjust=0) 
 
 p + scale_colour_viridis_d(option = "plasma") +
   theme_dark()
@@ -380,18 +380,18 @@ saveRDS(all_mix, file = "data/RDS/LFC_mix_OTUs_June19.RDS")
 
 ## Plot a table of the Mix OTUs with taxonomy   
 
-These OTUs had response greater than 3 in both early and late mix   
+These OTUs had response greater than 4 in both early and late mix   
 
 ```{r, message = F, warning = F}
 OTUs <- all_mix %>%
-  filter(Mix_early_log2FoldChange>3 & Mix_late_log2FoldChange>3)
+  filter(Mix_early_log2FoldChange>4 & Mix_late_log2FoldChange>4)
 
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
 ```
 
-## Plot relative abundance of OTUs with LFC > 3
+## Plot relative abundance of OTUs with LFC > 4
 ```{r}
 # We have lists of LFC OTUs, need to create a function that takes this and a target response group and returns the average relative abundance for these
 # input: list of OTUs, Treatment group
