@@ -170,7 +170,7 @@ dev.off()
 
 ## Plot a table of the Alfalfa OTUs with taxonomy   
 
-These OTUs had response greater than 3 in both early and late alfalfa   
+These OTUs had response greater than 4 in both early and late alfalfa   
 
 ```{r, message = F, warning = F}
 OTUs <- all_alf %>%
@@ -179,6 +179,23 @@ write.table(OTUs, file = "Figures/alf_responders.txt", sep = ",", quote = F, row
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
+```
+
+# WORK HERE
+
+Let's visualize the relative abundance of the significantly responding genera in each treatment. We will use a sacked area chart.
+
+https://www.r-graph-gallery.com/136-stacked-area-chart.html
+
+```{r}
+# Label all non responding OTUs as other for each treatment
+# Plot abundance of OTUs plus other == 1.0
+# X - axis will be time
+# Experiment with faceting to show early and late? 
+# Label band with OTU\Phyla\Genus
+# Plot at least 3 for each treatment
+ggplot(data, aes(x=time, y=percentage, fill=group)) + 
+    geom_area(alpha=0.6 , size=1, colour="black")
 ```
 
 ### Two Otus in the top 10 of alfalfa responders were from the Genus Pseudomonas     
