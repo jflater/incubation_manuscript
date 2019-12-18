@@ -174,7 +174,7 @@ These OTUs had response greater than 4 in both early and late alfalfa
 
 ```{r, message = F, warning = F}
 OTUs <- all_alf %>%
-  filter(Alfalfa_early_log2FoldChange>4 & Alfalfa_late_log2FoldChange>4)
+  filter(Alfalfa_early_log2FoldChange > 4 & Alfalfa_late_log2FoldChange > 4)
 write.table(OTUs, file = "Figures/alf_responders.txt", sep = ",", quote = F, row.names = F)
 kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
@@ -188,14 +188,31 @@ Let's visualize the relative abundance of the significantly responding genera in
 https://www.r-graph-gallery.com/136-stacked-area-chart.html
 
 ```{r}
-# Label all non responding OTUs as other for each treatment
-# Plot abundance of OTUs plus other == 1.0
-# X - axis will be time
-# Experiment with faceting to show early and late? 
-# Label band with OTU\Phyla\Genus
-# Plot at least 3 for each treatment
-ggplot(data, aes(x=time, y=percentage, fill=group)) + 
-    geom_area(alpha=0.6 , size=1, colour="black")
+alf.phy <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & day %in% c("0", "7", "14", "21", "35", "49", "97")) %>%
+  filter_taxa(function(x) sum(x) >= 3, T) 
+
+rela.alf.phy <- merge_samples(alf.phy, "day") %>%
+  transform_sample_counts(function(x) x / sum(x)) 
+
+sample_data(rela.alf.phy)$day <- levels(sample_data(alf.phy)$day)
+
+merge.phy <- rela.alf.phy %>%
+  psmelt() 
+
+merge.phy <- merge.phy %>%
+  mutate(Responder = ifelse(OTU %in% OTUs$OTU, "Responding", "Not_responding")) %>%
+  filter(Responder == "Responding")
+
+data <- merge.phy %>%
+  select(day, OTU, Abundance, Responder, Genus)
+
+pp <- ggplot(data, aes(x= as.numeric(day), y=Abundance, fill = OTU)) + 
+    geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black")
+
+pp + 
+  scale_x_continuous(breaks = c(0, 7, 14, 21, 35, 49, 97)) +
+  xlab("Day") +
+  ylab("Relative abundance \n of responders") 
 ```
 
 ### Two Otus in the top 10 of alfalfa responders were from the Genus Pseudomonas     
