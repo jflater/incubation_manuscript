@@ -25,6 +25,7 @@ library(ggrepel)
 library(viridis)
 library(knitr)
 library(kableExtra)
+library(gridExtra)
 ```
 
 ```{r, message = F, warning = F}
@@ -176,7 +177,7 @@ These OTUs had response greater than 4 in both early and late alfalfa
 OTUs <- all_alf %>%
   filter(Alfalfa_early_log2FoldChange > 4 & Alfalfa_late_log2FoldChange > 4)
 write.table(OTUs, file = "Figures/alf_responders.txt", sep = ",", quote = F, row.names = F)
-kable(OTUs) %>%
+table <- kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
   scroll_box(width = "100%", height = "400px")
 ```
@@ -209,10 +210,22 @@ data <- merge.phy %>%
 pp <- ggplot(data, aes(x= as.numeric(day), y=Abundance, fill = OTU)) + 
     geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black")
 
-pp + 
+ppp <- pp + 
   scale_x_continuous(breaks = c(0, 7, 14, 21, 35, 49, 97)) +
   xlab("Day") +
-  ylab("Relative abundance \n of responders") 
+  ylab("Relative abundance \n of responders") +
+  ggtitle("Alfalfa responders") 
+
+tabletable <- OTUs %>%
+  select(OTU, Phylum, Genus)
+
+ppp + annotation_custom(tableGrob(tabletable, rows = NULL),
+                        xmin = 14, xmax = 97, ymin = 0.02, ymax = 0.03)
+
+png("Figures/alfalfa_area_responders.png",height=8,width=10,units='in',res=300)
+ppp + annotation_custom(tableGrob(tabletable, rows = NULL),
+                        xmin = 14, xmax = 97, ymin = 0.02, ymax = 0.03)
+dev.off()
 ```
 
 ### Two Otus in the top 10 of alfalfa responders were from the Genus Pseudomonas     
