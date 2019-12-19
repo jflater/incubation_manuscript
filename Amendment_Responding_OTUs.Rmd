@@ -189,15 +189,20 @@ Let's visualize the relative abundance of the significantly responding genera in
 https://www.r-graph-gallery.com/136-stacked-area-chart.html
 
 ```{r}
-alf.phy <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & day %in% c("0", "7", "14", "21", "35", "49", "97")) %>%
+# We want to visualise the alfalfa treatment responding OTUs from early and late to reference. 
+# Use two plots faceted by treatment
+phy <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & day %in% c("0", "7", "14", "21", "35", "49", "97")) %>%
   filter_taxa(function(x) sum(x) >= 3, T) 
 
-rela.alf.phy <- merge_samples(alf.phy, "day") %>%
+colnames(sample_data(phy))
+
+rela.phy <- merge_samples(phy, "day") %>%
   transform_sample_counts(function(x) x / sum(x)) 
 
-sample_data(rela.alf.phy)$day <- levels(sample_data(alf.phy)$day)
+sample_data(rela.phy)$day <- levels(sample_data(phy)$day)
+sample_data(rela.phy)$treatment <- levels(as.factor(sample_data(phy)$treatment))
 
-merge.phy <- rela.alf.phy %>%
+merge.phy <- rela.phy %>%
   psmelt() 
 
 merge.phy <- merge.phy %>%
@@ -205,10 +210,13 @@ merge.phy <- merge.phy %>%
   filter(Responder == "Responding")
 
 data <- merge.phy %>%
-  select(day, OTU, Abundance, Responder, Genus)
+  select(treatment, day, OTU, Abundance, Responder, Genus) %>%
+  filter(treatment == "Alfalfa")
 
 pp <- ggplot(data, aes(x= as.numeric(day), y=Abundance, fill = OTU)) + 
-    geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black")
+  geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black") 
+  
+pp
 
 ppp <- pp + 
   scale_x_continuous(breaks = c(0, 7, 14, 21, 35, 49, 97)) +
