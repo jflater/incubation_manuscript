@@ -63,7 +63,7 @@ who_diff_day <- function(DDS, choice1, choice2, phy.object){
 log_plot <- function(sigtab,t1){
   sigtab <- sigtab %>%
     rownames_to_column(var = "OTU") %>%
-    filter(log2FoldChange >= 4) 
+    filter(log2FoldChange >= 0) 
   
   ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=2) + 
     coord_flip() +
@@ -175,7 +175,7 @@ These OTUs had response greater than 4 in both early and late alfalfa
 
 ```{r, message = F, warning = F}
 OTUs <- all_alf %>%
-  filter(Alfalfa_early_log2FoldChange > 4 & Alfalfa_late_log2FoldChange > 4)
+  filter(Alfalfa_early_log2FoldChange > 2 & Alfalfa_late_log2FoldChange > 2)
 write.table(OTUs, file = "Figures/alf_responders.txt", sep = ",", quote = F, row.names = F)
 table <- kable(OTUs) %>%
   kable_styling(bootstrap_options = "striped") %>%
@@ -191,38 +191,45 @@ https://www.r-graph-gallery.com/136-stacked-area-chart.html
 ```{r}
 # We want to visualise the alfalfa treatment responding OTUs from early and late to reference. 
 # Use two plots faceted by treatment
-phy <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & day %in% c("0", "7", "14", "21", "35", "49", "97")) %>%
-  filter_taxa(function(x) sum(x) >= 3, T) 
+alf <- subset_samples(inc.physeq, treatment %in% c("Alfalfa") & day %in% c("0", "7", "14", "21", "35", "49", "97")) 
 
-colnames(sample_data(phy))
+ref <- subset_samples(inc.physeq, treatment %in% c("Reference") & day %in% c("0", "7", "14", "21", "35", "49", "97")) 
 
-rela.phy <- merge_samples(phy, "day") %>%
-  transform_sample_counts(function(x) x / sum(x)) 
+rela.phy <- merge_samples(alf, "day") 
+rela.phy.data <- data.frame(sample_data(rela.phy))
+sample_data(rela.phy)$day = sample_names(rela.phy)
+sample_data(rela.phy)$treatment = "Alfalfa"
 
-sample_data(rela.phy)$day <- levels(sample_data(phy)$day)
-sample_data(rela.phy)$treatment <- levels(as.factor(sample_data(phy)$treatment))
+ref.phy <- merge_samples(ref, "day")
+ref.phy.data <- data.frame(sample_data(ref.phy))
+sample_data(ref.phy)$day = sample_names(ref.phy)
+sample_data(ref.phy)$treatment = "Reference"
 
-merge.phy <- rela.phy %>%
-  psmelt() 
+meltalf <- rela.phy %>%
+  transform_sample_counts(function(x) x / sum(x)) %>%
+  psmelt() %>%
+  select(OTU, Abundance, treatment, day)
 
-merge.phy <- merge.phy %>%
-  mutate(Responder = ifelse(OTU %in% OTUs$OTU, "Responding", "Not_responding")) %>%
-  filter(Responder == "Responding")
+meltref <- ref.phy %>%
+  transform_sample_counts(function(x) x / sum(x)) %>%
+  psmelt() %>%
+  select(OTU, Abundance, treatment, day)
 
-data <- merge.phy %>%
-  select(treatment, day, OTU, Abundance, Responder, Genus) %>%
-  filter(treatment == "Alfalfa")
+data <- rbind(meltalf, meltref) %>%
+  mutate(Responder = ifelse(OTU %in% early_alf_OTUS$OTU, "Responding", "Not_responding")) %>%
+  filter(Responder == "Responding") 
 
 pp <- ggplot(data, aes(x= as.numeric(day), y=Abundance, fill = OTU)) + 
-  geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black") 
+  geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black") + 
+  facet_grid(treatment ~ .)
   
 pp
 
 ppp <- pp + 
   scale_x_continuous(breaks = c(0, 7, 14, 21, 35, 49, 97)) +
   xlab("Day") +
-  ylab("Relative abundance \n of responders") +
-  ggtitle("Alfalfa responders") 
+  ylab("Relative abundance \n of responders (LFC > 2") +
+  ggtitle("Early alfalfa responders") 
 
 tabletable <- OTUs %>%
   select(OTU, Phylum, Genus)
