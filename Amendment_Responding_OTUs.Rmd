@@ -18,7 +18,7 @@ knitr::opts_knit$set(root.dir = normalizePath("."))
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
-BiocManager::install("phyloseq", "DESeq2")
+BiocManager::install(c("phyloseq", "DESeq2"))
 ```
 
 ```{r, echo = F, message = F, warning = F}
@@ -139,9 +139,11 @@ otustokeep <- intersect(log.plot.early.alf.data$OTU, log.plot.late.alf.data$OTU)
 
 # Trim and rename variables
 early_alf_OTUS <- log.plot.early.alf.data %>%
+  filter(log2FoldChange >= 2) %>%
   select(OTU, Phylum, Class, Order, Family, Genus, Alfalfa_early_log2FoldChange = log2FoldChange) 
 
 late_alf_OTUS <- log.plot.late.alf.data %>%
+  filter(log2FoldChange >= 2) %>%
   select(OTU, Phylum, Class, Order, Family, Genus, Alfalfa_late_log2FoldChange = log2FoldChange)
 
 # join early and late
@@ -190,7 +192,7 @@ table <- kable(OTUs) %>%
 
 # WORK HERE
 
-Let's visualize the relative abundance of the significantly responding genera in each treatment. We will use a sacked area chart.
+Let's visualize the relative abundance of the significantly responding genera in each treatment. We will use a stacked area chart.
 
 https://www.r-graph-gallery.com/136-stacked-area-chart.html
 
@@ -214,38 +216,105 @@ sample_data(ref.phy)$treatment = "Reference"
 meltalf <- rela.phy %>%
   transform_sample_counts(function(x) x / sum(x)) %>%
   psmelt() %>%
-  select(OTU, Abundance, treatment, day)
+  select(OTU, Abundance, treatment, day, Phylum)
 
 meltref <- ref.phy %>%
   transform_sample_counts(function(x) x / sum(x)) %>%
   psmelt() %>%
-  select(OTU, Abundance, treatment, day)
+  select(OTU, Abundance, treatment, day, Phylum)
+```
 
+```{r}
 data <- rbind(meltalf, meltref) %>%
   mutate(Responder = ifelse(OTU %in% early_alf_OTUS$OTU, "Responding", "Not_responding")) %>%
-  filter(Responder == "Responding") 
+  filter(Responder == "Responding") %>%
+  group_by(treatment, day, Phylum) %>%
+  mutate(phyla_sum = sum(Abundance)) %>%
+  select(treatment, day, Phylum, phyla_sum) %>%
+  distinct()
 
-pp <- ggplot(data, aes(x= as.numeric(day), y=Abundance, fill = OTU)) + 
-  geom_area(aes(fill = OTU), alpha=0.6 , size=1, colour="black") + 
-  facet_grid(treatment ~ .)
+datalate <- rbind(meltalf, meltref) %>%
+  mutate(Responder = ifelse(OTU %in% late_alf_OTUS$OTU, "Responding", "Not_responding")) %>%
+  filter(Responder == "Responding") %>%
+  group_by(treatment, day, Phylum) %>%
+  mutate(phyla_sum = sum(Abundance)) %>%
+  select(treatment, day, Phylum, phyla_sum) %>%
+  distinct()
+```
+
+```{r}
+myLevels <- data %>%
+  filter(day==7 & treatment == "Alfalfa")%>%
+  arrange(desc(phyla_sum))
+
+data$Phylum <- factor(data$Phylum, levels = myLevels$Phylum) 
+
+pp <- data %>%
+  ggplot(aes(x= as.numeric(day), y=phyla_sum)) + 
+  geom_area(aes(fill = Phylum), size=.25, colour="black") + 
+  facet_grid(treatment ~ .) 
   
-pp
+#pp
 
 ppp <- pp + 
   scale_x_continuous(breaks = c(0, 7, 14, 21, 35, 49, 97)) +
   xlab("Day") +
-  ylab("Relative abundance \n of responders (LFC > 2") +
+  ylab("Relative abundance \n of responders (LFC > 2)") +
   ggtitle("Early alfalfa responders") 
+ppp
+```
+```{r}
+# Sort based on abundance at day 35, determine order
+myLevels2 <- datalate %>%
+  filter(day==35 & treatment == "Alfalfa") %>%
+  arrange(desc(phyla_sum))
 
-tabletable <- OTUs %>%
-  select(OTU, Phylum, Genus)
+# Set order of Phyla based on abundance at day 35
+datalate$Phylum <- factor(datalate$Phylum, levels = myLevels2$Phylum) 
+  
+plot2 <- datalate %>%
+  ggplot(aes(x= as.numeric(day), y=phyla_sum)) + 
+  geom_area(aes(fill = Phylum), size=.25, colour="black") + 
+  facet_grid(treatment ~ .) 
 
-ppp + annotation_custom(tableGrob(tabletable, rows = NULL),
-                        xmin = 14, xmax = 97, ymin = 0.02, ymax = 0.03)
+plot2
 
-png("Figures/alfalfa_area_responders.png",height=8,width=10,units='in',res=300)
-ppp + annotation_custom(tableGrob(tabletable, rows = NULL),
-                        xmin = 14, xmax = 97, ymin = 0.02, ymax = 0.03)
+# Add titles and scale x-axis
+pplot2 <- plot2 + 
+  scale_x_continuous(breaks = c(0, 7, 14, 21, 35, 49, 97)) +
+  xlab("Day") +
+  ylab("Relative abundance \n of responders (LFC > 2)") +
+  ggtitle("Late alfalfa responders") 
+
+pplot2
+```
+
+Note on coloring, it's annoying how phyla with have different colors between plots, let's see if we can fix that
+```{r}
+# We have many more colors need, it would be easiest to have one that can cover all levels of phyla
+# list of phyla
+phylalist <- sample(as.character(unique(all_alf$Phylum)))
+
+library(colorspace)
+colors27 <- sequential_hcl(n_distinct(phylalist), palette = "viridis")
+
+# I found this on stackoverflow
+scale_fill_phyla_consistent <- function(...){
+    ggplot2:::manual_scale(
+        'fill', 
+        values = setNames(colors27, phylalist), 
+        ...
+    )
+}
+
+pplot2 + scale_fill_phyla_consistent()
+ppp + scale_fill_phyla_consistent()
+
+png("Figures/alfalfa_early_area_responders.png",height=8,width=10,units='in',res=300)
+ppp + scale_fill_phyla_consistent()
+dev.off()
+png("Figures/alfalfa_late_area_responders.png",height=8,width=10,units='in',res=300)
+pplot2 + scale_fill_phyla_consistent()
 dev.off()
 ```
 
